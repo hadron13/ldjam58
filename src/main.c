@@ -3,7 +3,10 @@
 #include <SDL3/SDL_video.h>
 #include"glad/gl.h"
 #include"render.h"
+#include"entity.h"
 #include<stdio.h>
+
+sprite_t sprites[MAX_ENTITIES];
 
 int main(){
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS);
@@ -33,6 +36,9 @@ int main(){
     if (!placeholder_texture) printf("couldn't load the placeholder texture\n");
     // --
 
+    // creating an entity
+    sprites[0] = (sprite_t){0, 0, 100, 100, placeholder_texture};
+
     bool running = true;
     
     while(running){
@@ -49,7 +55,8 @@ int main(){
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // render
-        draw_quad(shader_program, placeholder_texture);
+        render_entities(sprites, 1, shader_program);
+        //draw_quad(shader_program, placeholder_texture);
 
         SDL_GL_SwapWindow(window);
     }

@@ -1,6 +1,8 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
+#include "render.h"
+
 #define MAX_ENTITIES 64
 
 typedef struct {

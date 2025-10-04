@@ -1,8 +1,7 @@
 #include "entity.h"
 
 void render_entities(const sprite_t sprites[MAX_ENTITIES], int count, int shader_program) {
-
     for (int i = 0; i < count; ++i) {
-        // TODO: render entities
+        draw_quad(shader_program, sprites[i].texture);
     }
 }
