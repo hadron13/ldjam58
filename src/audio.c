@@ -11,9 +11,8 @@ SDL_AudioSpec audio_spec;
 int init_audio(void) {
     SDL_zero(audio_spec);
     audio_spec.freq = 44100;
-    audio_spec.format = SDL_AUDIO_S16SYS;
+    audio_spec.format = SDL_AUDIO_S16;
     audio_spec.channels = 2;
-    audio_spec.samples = 4096;
 
     audio_stream = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &audio_spec, NULL, NULL);
     if (!audio_stream) {
@@ -47,38 +46,24 @@ int load_sound(const char* filename) {
 
     SDL_AudioSpec loaded_spec;
     Uint8* loaded_data;
-    Uint32 loaded_len;
+    int loaded_len;
     if (!SDL_LoadWAV(filename, &loaded_spec, &loaded_data, &loaded_len)) {
         printf("Couldn't load %s: %s\n", filename, SDL_GetError());
         return -1;
     }
 
-    SDL_AudioCVT cvt;
-    if (SDL_BuildAudioCVT(&cvt, loaded_spec.format, loaded_spec.channels, loaded_spec.freq,
-                          audio_spec.format, audio_spec.channels, audio_spec.freq) < 0) {
-        printf("Couldn't build audio CVT: %s\n", SDL_GetError());
+    Uint8* converted_data = NULL;
+    int converted_len = 0;
+    if (!SDL_ConvertAudioSamples(&loaded_spec, loaded_data, loaded_len, &audio_spec, &converted_data, &converted_len)) {
+        printf("Couldn't convert audio: %s\n", SDL_GetError());
         SDL_free(loaded_data);
         return -1;
     }
 
-    cvt.buf = (Uint8*)malloc(loaded_len * cvt.len_mult);
-    if (!cvt.buf) {
-        printf("Malloc failed for audio conversion\n");
-        SDL_free(loaded_data);
-        return -1;
-    }
-
-    memcpy(cvt.buf, loaded_data, loaded_len);
     SDL_free(loaded_data);
 
-    if (SDL_ConvertAudio(&cvt) < 0) {
-        printf("Couldn't convert audio: %s\n", SDL_GetError());
-        free(cvt.buf);
-        return -1;
-    }
-
-    sounds[num_sounds].data = cvt.buf;
-    sounds[num_sounds].len = cvt.len;
+    sounds[num_sounds].data = converted_data;
+    sounds[num_sounds].len = converted_len;
     return num_sounds++;
 }
 

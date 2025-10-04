@@ -4,6 +4,7 @@
 #include"glad/gl.h"
 #include"render.h"
 #include"entity.h"
+#include"audio.h"
 #include<stdio.h>
 
 sprite_t sprites[MAX_ENTITIES];
@@ -11,6 +12,9 @@ sprite_t sprites[MAX_ENTITIES];
 int main(){
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS);
 
+    if (init_audio() < 0) {
+        printf("Audio initialization failed\n");
+    }
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
@@ -38,13 +42,15 @@ int main(){
     // --
 
     // main audio track
-    int sound_id = load_sound("assets/sfx/space.wav");  // Assume a "sound.wav" file exists in the working directory
+    int sound_id = load_sound("assets/sfx/space.wav");
     if (sound_id < 0) printf("couldn't load the sound file\n");
 
     // creating an entity
     sprites[0] = (sprite_t){0, 0, 100, 100, placeholder_texture};
 
     bool running = true;
+
+    bool playing_sound = false;
     
     while(running){
         SDL_Event event;
@@ -54,6 +60,11 @@ int main(){
                     running = false;
                     break;
             }
+        }
+
+        if (!playing_sound) {
+            play_sound(sound_id);
+            playing_sound = true;
         }
 
         glClearColor(0.1, 0.1, 0.1, 1.0); 
