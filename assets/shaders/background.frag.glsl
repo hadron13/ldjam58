@@ -13,7 +13,7 @@ uniform float time;
 ///////////////////////////////////////////////////////////////
 // math const
 const float PI = 3.14159265359;
-const float MAX = 10000.0;
+const float MAX = 100.0;
 
 // ray intersects sphere
 // e = -b +/- sqrt( b^2 - c )
@@ -210,8 +210,6 @@ void main() {
     vec3 light_direction = normalize(vec3(sin(time/10.0), 0, cos(time/10.0)));
 
 
-
-
     // magic number to match the raymarched scatter with the justinvented:tm: UV-based sphere
     centered_uv *= 1.735; 
 
@@ -230,9 +228,13 @@ void main() {
 
     //scattering
     
+    float sky = step(0.5, pNoise(ray_direction.xy * 100.0 + vec2(pNoise(ray_direction.xy * 100.0 - 40.0, 2), pNoise(ray_direction.xy * 100.0 + 20.0, 2)) * 10.0 , 3)); 
+    color = vec3(sky) * (1.0 - is_earth);
+
     vec2 e = ray_vs_sphere( ray_origin, ray_direction, R );
 	if ( e.x > e.y ) {
-		FragColor = vec4( color, 1.0 );
+		//skybox
+        FragColor = vec4(color, 1.0 );
         return;
 	}
 	
@@ -290,7 +292,7 @@ void main() {
     // vec2 a = ray_vs_sphere( ray_origin, ray_direction, R_INNER);
     // color = vec3(is_earth - step(a.x, a.y) );
 
-    color = vec3(diffuse_factor * terrain_color) * is_earth;
+    color += vec3(diffuse_factor * terrain_color) * is_earth;
     color += scatter * vec3(1.0, 1.0, 1.5);
     // color = terrain_color * is_earth;
     
