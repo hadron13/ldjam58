@@ -50,7 +50,7 @@ int main(){
 
     bool running = true;
 
-    bool playing_sound = false;
+    play_sound(sound_id);
     
     while(running){
         SDL_Event event;
@@ -60,11 +60,6 @@ int main(){
                     running = false;
                     break;
             }
-        }
-
-        if (!playing_sound) {
-            play_sound(sound_id);
-            playing_sound = true;
         }
 
         glClearColor(0.1, 0.1, 0.1, 1.0); 
