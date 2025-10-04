@@ -17,7 +17,9 @@ char *load_file(const char *path){
     fseek(file, 0, SEEK_SET);  
 
     char *string = malloc(file_size + 1);
-    fread(string, file_size, 1, file);
+    if(fread(string, file_size, 1, file) == 0){
+        return NULL;
+    }
 
     string[file_size] = 0;
     fclose(file);
@@ -120,32 +122,21 @@ void draw_quad(int shader_program, int texture, float x, float y, float width, f
         setup_done = 1;
     }
 
-    float left = (2.0f * x / window_width) - 1.0f;
-    float right = (2.0f * (x + width) / window_width) - 1.0f;
-    float bottom = (2.0f * y / window_height) - 1.0f;
-    float top = (2.0f * (y + height) / window_height) - 1.0f;
-
-    float vertices[] = {
-        left,  top,          0.0f, 1.0f,  // Top-left
-        left,  bottom,       0.0f, 0.0f,  // Bottom-left
-        right, bottom,       1.0f, 0.0f,  // Bottom-right
-        left,  top,          0.0f, 1.0f,  // Top-left
-        right, bottom,       1.0f, 0.0f,  // Bottom-right
-        right, top,          1.0f, 1.0f   // Top-right
-    };
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
-
     glUseProgram(shader_program);
-    int texLoc = glGetUniformLocation(shader_program, "tex");  
+    
+
+
+    int texLoc = glGetUniformLocation(shader_program, "tex");
     if (texLoc != -1) {
         glUniform1i(texLoc, 0);
     }
-    int resolutionLoc = glGetUniformLocation(shader_program, "tex");  
-
+    int resolutionLoc = glGetUniformLocation(shader_program, "resolution");  
     if(resolutionLoc != -1){
-        glUniform2f(resolutionLoc, viewport_w, viewport_h);
+        glUniform2f(resolutionLoc, window_width, window_height);
+    }
+    int rectLoc= glGetUniformLocation(shader_program, "rect");  
+    if(rectLoc != -1){
+        glUniform4f(rectLoc, x, y, width, height);
     }
 
     glActiveTexture(GL_TEXTURE0);

@@ -41,8 +41,8 @@ int main(){
     gltInit();
 
     
-    int shader_program = shader_compile("assets/shaders/quad.vert.glsl", "assets/shaders/sprite.frag.glsl");
-    if (!shader_program) printf("couldn't create shader program\n");
+    int sprite_shader = shader_compile("assets/shaders/quad.vert.glsl", "assets/shaders/sprite.frag.glsl");    
+    int earth_shader = shader_compile("assets/shaders/quad.vert.glsl", "assets/shaders/earth.frag.glsl");
 
     int background_texture = texture_load("assets/images/Space_Background1.png");
     int placeholder_texture = texture_load("test.jpg");
@@ -87,8 +87,9 @@ int main(){
         glClearColor(0.1, 0.1, 0.1, 1.0); 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // render
-        render_entities(sprites, 2, shader_program, viewport_w, viewport_h);
+        // draw_quad(sprite_shader, 0, 0, 0, viewport_w, viewport_h, viewport_w, viewport_h);
+
+        render_entities(sprites, 2, sprite_shader, viewport_w, viewport_h);
         
         // glt example code
         gltBeginDraw();
