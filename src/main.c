@@ -1,11 +1,15 @@
-#include<SDL3/SDL.h>
+#include <SDL3/SDL.h>
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_video.h>
+#include <SDL3/SDL_timer.h>
 #include"glad/gl.h"
 #include"render.h"
 #include"entity.h"
 #include"audio.h"
-#include<stdio.h>
+#define GLT_IMPLEMENTATION
+#include"gl_text.h"
+#include <stdio.h>
+#include <math.h>
 
 sprite_t sprites[MAX_ENTITIES];
 
@@ -31,6 +35,8 @@ int main(){
     
     gladLoadGL(SDL_GL_GetProcAddress);
 
+    gltInit();
+
     // creating shader program and loading texture
     //                   shader path: using placeholder
     
@@ -52,7 +58,18 @@ int main(){
 
     play_sound(sound_id);
     
+    // text
+    GLTtext *text1 = gltCreateText();
+    gltSetText(text1, "Hello World!");
+
+    GLTtext *text2 = gltCreateText();
+
+    int viewport_width = 800, viewport_height = 600;
+    double time;
+    char str[30];
+    
     while(running){
+        time = SDL_GetTicks() / 1000.0;
         SDL_Event event;
         while(SDL_PollEvent(&event)){
             switch(event.type){
@@ -67,11 +84,39 @@ int main(){
 
         // render
         render_entities(sprites, 1, shader_program);
-        //draw_quad(shader_program, placeholder_texture);
+        
+        // glt example code
+        gltBeginDraw();
+
+        gltColor(1.0f, 1.0f, 1.0f, 1.0f);
+        gltDrawText2D(text1, 0.0f, 0.0f, 1.0f); // x=0.0, y=0.0, scale=1.0
+
+        gltDrawText2DAligned(text1,
+            (GLfloat)(viewport_width / 2),
+            (GLfloat)(viewport_height / 2),
+            3.0f,
+            GLT_CENTER, GLT_CENTER);
+
+        sprintf(str, "Time: %.4f", time);
+        gltSetText(text2, str);
+
+        gltColor(
+            cosf((float)time) * 0.5f + 0.5f,
+            sinf((float)time) * 0.5f + 0.5f,
+            1.0f,
+            1.0f);
+
+        gltDrawText2DAligned(text2, 0.0f, (GLfloat)viewport_height, 1.0f, GLT_CENTER, GLT_CENTER);
+
+        gltEndDraw();
+        // --
 
         SDL_GL_SwapWindow(window);
     }
 
+    gltDeleteText(text1);
+    gltDeleteText(text2);
+    gltTerminate();
     
     SDL_GL_DestroyContext(gl_context);
 
