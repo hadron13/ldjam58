@@ -3,19 +3,122 @@
 #include "render.h"
 #include <stdio.h>
 
-// TODO: hardcode the shaders
-static const char *vertex_shader = "";
-static const char *fragment_shader = "";
+static const char* vertex_shader = "#version 330 core\n"
+    "layout (location = 0) in vec2 aPos;\n"
+    "layout (location = 1) in vec2 aTexCoord;\n"
+    "out vec2 TexCoord;\n"
+    "void main() {\n"
+    "    TexCoord = aTexCoord;\n"
+    "    gl_Position = vec4(aPos, 0.0, 1.0);\n"
+    "}\0";
 
+static const char* fragment_shader = "#version 330 core\n"
+    "in vec2 TexCoord;\n"
+    "out vec4 FragColor;\n"
+    "uniform sampler2D placeholder_texture;\n"
+    "void main() {\n"
+    "    FragColor = texture(placeholder_texture, TexCoord);\n"
+    "}\0";
+
+
+// helper
+int compile_shader(int type, const char *source) {
+    int shader = glCreateShader(type);
+    glShaderSource(shader, 1, &source, NULL);
+    glCompileShader(shader);
+
+    int success;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        char shader_log[512];
+        glGetShaderInfoLog(shader, 512, NULL, shader_log);
+        printf("Shader compilation failed: %s\n", shader_log);
+    }
+    return shader;
+}
 
 shader_t shader_compile(const char *vertex_path, const char *fragment_path){ 
-    return 0;
+    // TODO: read files
+
+    // using hardcoded shaders for now
+    int vertex = compile_shader(GL_VERTEX_SHADER, vertex_shader);
+    int fragment = compile_shader(GL_FRAGMENT_SHADER, fragment_shader);
+
+    // link shader program
+    int program = glCreateProgram();
+    glAttachShader(program, vertex);
+    glAttachShader(program, fragment);
+    glLinkProgram(program);
+
+    // cleanup
+    glDeleteShader(vertex);
+    glDeleteShader(fragment);
+
+    return program;
 }
 
 texture_t texture_load(const char *path) {
-    return 0;
+    stbi_set_flip_vertically_on_load(1); // for opengl
+
+    int w, h, c;
+    unsigned char *data = stbi_load(path, &w, &h, &c, 4);
+    if (!data) printf("Couldn't load texture: %s\n", path);
+
+    int texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    stbi_image_free(data);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    return (texture_t)texture;
 }
 
-void draw_quad(shader_t shader, texture_t texture) {
+static int VAO = 0, VBO = 0, EBO = 0;
+static int setupDone = 0;
 
+void draw_quad(int shader_program, int texture) {
+    if (!setupDone) {
+        float vertices[] = {
+            -1.0f,  1.0f,  0.0f, 1.0f,
+            -1.0f, -1.0f,  0.0f, 0.0f,
+             1.0f, -1.0f,  1.0f, 0.0f,
+             1.0f,  1.0f,  1.0f, 1.0f
+        };
+        unsigned int indices[] = { 0, 1, 2, 0, 2, 3 };
+
+        glGenVertexArrays(1, &VAO);
+        glGenBuffers(1, &VBO);
+        glGenBuffers(1, &EBO);
+
+        glBindVertexArray(VAO);
+
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+        glEnableVertexAttribArray(1);
+
+        setupDone = 1;
+    }
+
+    glUseProgram(shader_program);
+    int texLoc = glGetUniformLocation(shader_program, "placeholder_texture");
+    glUniform1i(texLoc, 0);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }

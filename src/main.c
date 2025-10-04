@@ -25,10 +25,11 @@ int main(){
     gladLoadGL(SDL_GL_GetProcAddress);
 
     // creating shader program and loading texture
-    int shader_program = create_shader_program();
+    //                   shader path: using placeholder
+    int shader_program = shader_compile("", "");
     if (!shader_program) printf("couldn't create shader program\n");
 
-    int placeholder_texture = load_texture("test.png");
+    int placeholder_texture = texture_load("test.jpg");
     if (!placeholder_texture) printf("couldn't load the placeholder texture\n");
     // --
 

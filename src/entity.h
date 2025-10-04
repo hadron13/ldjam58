@@ -7,8 +7,8 @@ typedef struct {
     float x, y;
     float w, h;
     int texture;
-} sprite;
+} sprite_t;
 
-void render_entities(const sprite sprites[MAX_ENTITIES], int count, int shader_program);
+void render_entities(const sprite_t sprites[MAX_ENTITIES], int count, int shader_program);
 
 #endif
