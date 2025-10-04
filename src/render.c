@@ -139,7 +139,7 @@ void draw_quad(int shader_program, int texture, float x, float y, float width, f
     }
 
     glUseProgram(shader_program);
-    int texLoc = glGetUniformLocation(shader_program, "placeholder_texture");  // Or "ourTexture"?
+    int texLoc = glGetUniformLocation(shader_program, "tex");  
     if (texLoc != -1) {
         glUniform1i(texLoc, 0);
     }

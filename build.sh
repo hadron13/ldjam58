@@ -1,1 +1,3 @@
-gcc src/main.c src/render.c src/entity.c glad/src/gl.c -o build/ldjam -lSDL3 -lGL -Iglad/include
+
+cp -r assets build
+gcc src/*.c glad/src/gl.c -o build/ldjam -lSDL3 -lGL -Iglad/include -lm -g

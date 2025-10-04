@@ -30,7 +30,7 @@ int main(){
     // creating shader program and loading texture
     //                   shader path: using placeholder
     
-    int shader_program = shader_compile("assets/shaders/quad.vert.glsl", "assets/shaders/earth.frag.glsl");
+    int shader_program = shader_compile("assets/shaders/quad.vert.glsl", "assets/shaders/sprite.frag.glsl");
     if (!shader_program) printf("couldn't create shader program\n");
 
     int placeholder_texture = texture_load("test.jpg");
