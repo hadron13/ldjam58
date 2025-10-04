@@ -24,7 +24,8 @@ int main(){
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-    SDL_Window * window = SDL_CreateWindow("Garbage Collection !!!", 800, 600, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+    int viewport_w = 800, viewport_h = 600;
+    SDL_Window * window = SDL_CreateWindow("Garbage Collection !!!", viewport_w, viewport_h, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
 
     
     SDL_GLContext gl_context = SDL_GL_CreateContext(window);
@@ -43,7 +44,7 @@ int main(){
     int shader_program = shader_compile("assets/shaders/quad.vert.glsl", "assets/shaders/sprite.frag.glsl");
     if (!shader_program) printf("couldn't create shader program\n");
 
-    int placeholder_texture = texture_load("test.jpg");
+    int placeholder_texture = texture_load("assets/images/Space_Background1.png");
     if (!placeholder_texture) printf("couldn't load the placeholder texture\n");
     // --
 
@@ -64,7 +65,6 @@ int main(){
 
     GLTtext *text2 = gltCreateText();
 
-    int viewport_width = 800, viewport_height = 600;
     double time;
     char str[30];
     
@@ -75,6 +75,11 @@ int main(){
             switch(event.type){
                 case SDL_EVENT_QUIT:
                     running = false;
+                    break;
+                case SDL_EVENT_WINDOW_RESIZED:
+                    viewport_w = event.window.data1;
+                    viewport_h = event.window.data2;
+                    glViewport(0, 0, viewport_w, viewport_h);
                     break;
             }
         }
@@ -92,8 +97,8 @@ int main(){
         gltDrawText2D(text1, 0.0f, 0.0f, 1.0f); // x=0.0, y=0.0, scale=1.0
 
         gltDrawText2DAligned(text1,
-            (GLfloat)(viewport_width / 2),
-            (GLfloat)(viewport_height / 2),
+            (GLfloat)(viewport_w / 2),
+            (GLfloat)(viewport_h / 2),
             3.0f,
             GLT_CENTER, GLT_CENTER);
 
@@ -106,7 +111,7 @@ int main(){
             1.0f,
             1.0f);
 
-        gltDrawText2DAligned(text2, 0.0f, (GLfloat)viewport_height, 1.0f, GLT_CENTER, GLT_CENTER);
+        gltDrawText2DAligned(text2, 0.0f, (GLfloat)viewport_h, 1.0f, GLT_CENTER, GLT_CENTER);
 
         gltEndDraw();
         // --
