@@ -11,14 +11,14 @@ int compileShader() {
 
 }
 
-int createShaderProgram() {
+int create_shader_program() {
 
 }
 
-int loadTexture() {
+int load_texture() {
 
 }
 
-void renderQuad(int shaderProgram, int texture) {
+void draw_quad(int shaderProgram, int texture) {
 
 }
