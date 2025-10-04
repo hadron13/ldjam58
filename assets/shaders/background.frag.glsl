@@ -221,7 +221,9 @@ void main() {
     if(isnan(normal)) normal = 0.0;
     vec3 normal_vec = normalize(vec3(centered_uv, normal));
 
-    if(dot(ray_direction * vec3(-1.0, 1.0, 1.0), -light_direction) * (1.0 - is_earth) > 0.9995){
+    float sun_dot = dot(ray_direction * vec3(-1.0, 1.0, 1.0), -light_direction) ;
+
+    if(sun_dot * (1.0 - is_earth) > 0.9995){
 		FragColor = vec4(1.0);
         return;
     }
@@ -229,6 +231,7 @@ void main() {
     //scattering
     
     float sky = step(0.5, pNoise(ray_direction.xy * 100.0 + vec2(pNoise(ray_direction.xy * 100.0 - 40.0, 2), pNoise(ray_direction.xy * 100.0 + 20.0, 2)) * 10.0 , 3)); 
+    sky *= max(0.0, 1.0 - sun_dot);
     color = vec3(sky) * (1.0 - is_earth);
 
     vec2 e = ray_vs_sphere( ray_origin, ray_direction, R );
