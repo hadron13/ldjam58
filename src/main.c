@@ -13,6 +13,8 @@
 
 sprite_t sprites[MAX_ENTITIES];
 
+
+
 int main(){
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS);
 
@@ -24,7 +26,7 @@ int main(){
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-    int viewport_w = 800, viewport_h = 600;
+    int viewport_w = 1280, viewport_h = 720;
     SDL_Window * window = SDL_CreateWindow("Garbage Collection !!!", viewport_w, viewport_h, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
 
     
@@ -86,7 +88,7 @@ int main(){
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // render
-        render_entities(sprites, 2, shader_program, 800, 600);
+        render_entities(sprites, 2, shader_program, viewport_w, viewport_h);
         
         // glt example code
         gltBeginDraw();
