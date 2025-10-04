@@ -107,8 +107,6 @@ int main(){
         glClearColor(0.1, 0.1, 0.1, 1.0); 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // draw_quad(sprite_shader, 0, 0, 0, viewport_w, viewport_h, viewport_w, viewport_h);
-
         render_entities(sprites, 5, sprite_shader, viewport_w, viewport_h, camera_pos_x, camera_pos_y);
 
         camera_pos_x = sprites[1].x - viewport_w + 100; camera_pos_y = sprites[1].y - viewport_h + 100;
@@ -119,13 +117,7 @@ int main(){
         gltColor(1.0f, 1.0f, 1.0f, 1.0f);
         gltDrawText2D(text1, 0.0f, 0.0f, 1.0f); // x=0.0, y=0.0, scale=1.0
 
-        gltDrawText2DAligned(text1,
-            (GLfloat)(viewport_w / 2.0),
-            (GLfloat)(viewport_h / 2.0),
-            3.0f,
-            GLT_CENTER, GLT_CENTER);
-
-        sprintf(str, "Time: %.4f", time);
+        sprintf(str, "rocket accel: %.4f", rocket_acc_x + rocket_acc_y);
         gltSetText(text2, str);
 
         gltColor(
