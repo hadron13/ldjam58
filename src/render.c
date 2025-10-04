@@ -3,7 +3,7 @@
 #include "render.h"
 #include <stdio.h>
 
-static const char* vertex_shader = "#version 330 core\n"
+static char* vertex_shader = "#version 330 core\n"
     "layout (location = 0) in vec2 aPos;\n"
     "layout (location = 1) in vec2 aTexCoord;\n"
     "out vec2 TexCoord;\n"
@@ -12,7 +12,7 @@ static const char* vertex_shader = "#version 330 core\n"
     "    gl_Position = vec4(aPos, 0.0, 1.0);\n"
     "}\0";
 
-static const char* fragment_shader = "#version 330 core\n"
+static char* fragment_shader = "#version 330 core\n"
     "in vec2 TexCoord;\n"
     "out vec4 FragColor;\n"
     "uniform sampler2D placeholder_texture;\n"
@@ -57,9 +57,11 @@ int compile_shader(int type, const char *source) {
 shader_t shader_compile(const char *vertex_path, const char *fragment_path){ 
     // TODO: read files
 
-    // using hardcoded shaders for now
-    int vertex = compile_shader(GL_VERTEX_SHADER, vertex_shader);
-    int fragment = compile_shader(GL_FRAGMENT_SHADER, fragment_shader);
+    char *vertex_source = (vertex_path == NULL)?vertex_shader : load_file(vertex_path);
+    char *fragment_source = (vertex_path == NULL)?fragment_shader : load_file(fragment_path);
+
+    int vertex = compile_shader(GL_VERTEX_SHADER, vertex_source);
+    int fragment = compile_shader(GL_FRAGMENT_SHADER, fragment_source);
 
     // link shader program
     int program = glCreateProgram();
