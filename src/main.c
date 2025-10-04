@@ -61,6 +61,7 @@ int main(){
     sprites[4] = (sprite_t){500, 300, 50, 50, placeholder_texture};
 
     float rocket_acc_x = 0, rocket_acc_y = 0;
+    float rocket_radial_acc = 0;
 
     bool running = true;
 
@@ -97,12 +98,16 @@ int main(){
         }
 
         const bool* keys = SDL_GetKeyboardState(NULL);
-        if (keys[SDL_SCANCODE_W]) rocket_acc_y += speed * dt;
-        if (keys[SDL_SCANCODE_S]) rocket_acc_y -= speed * dt;
+        if (keys[SDL_SCANCODE_W]) rocket_acc_y -= speed * dt;
+        if (keys[SDL_SCANCODE_S]) rocket_acc_y += speed * dt;
         if (keys[SDL_SCANCODE_A]) rocket_acc_x -= speed * dt;
         if (keys[SDL_SCANCODE_D]) rocket_acc_x += speed * dt;
 
+        if (keys[SDL_SCANCODE_Q]) rocket_radial_acc -= 0.1 * dt;
+        if (keys[SDL_SCANCODE_E]) rocket_radial_acc += 0.1 * dt;
+
         sprites[1].x += rocket_acc_x; sprites[1].y += rocket_acc_y;
+        sprites[1].r += rocket_radial_acc;
         sprites[0].x = camera_pos_x; sprites[0].y = camera_pos_y;
         sprites[0].w = viewport_w; sprites[0].h = viewport_h;
 
@@ -119,7 +124,7 @@ int main(){
         gltColor(1.0f, 1.0f, 1.0f, 1.0f);
         gltDrawText2D(text1, 0.0f, 0.0f, 1.0f); // x=0.0, y=0.0, scale=1.0
 
-        sprintf(str, "rocket accel: %.4f", fabs(rocket_acc_x + rocket_acc_y));
+        sprintf(str, "rocket accel: %.4f | radial accel: %.4f", fabs(rocket_acc_x + rocket_acc_y), fabs(rocket_radial_acc));
         gltSetText(text2, str);
 
         gltColor(
