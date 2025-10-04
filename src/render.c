@@ -21,6 +21,23 @@ static const char* fragment_shader = "#version 330 core\n"
     "}\0";
 
 
+char *load_file(const char *path){
+    FILE *file = fopen(path, "rb");
+
+    if (file == NULL) return NULL;
+
+    fseek(file, 0, SEEK_END);
+    size_t file_size = ftell(file);
+    fseek(file, 0, SEEK_SET);  
+
+    char *string = malloc(file_size + 1);
+    fread(string, file_size, 1, file);
+
+    string[file_size] = 0;
+    
+    return string;
+}
+
 // helper
 int compile_shader(int type, const char *source) {
     int shader = glCreateShader(type);
