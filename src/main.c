@@ -103,6 +103,7 @@ int main(){
         if (keys[SDL_SCANCODE_D]) rocket_acc_x += speed * dt;
 
         sprites[1].x += rocket_acc_x; sprites[1].y += rocket_acc_y;
+        sprites[0].x = camera_pos_x; sprites[0].y = camera_pos_y;
 
         glClearColor(0.1, 0.1, 0.1, 1.0); 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
