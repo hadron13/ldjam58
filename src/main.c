@@ -59,6 +59,9 @@ int main(){
     int sound_id = load_sound("assets/sfx/space.wav");
     if (sound_id < 0) printf("couldn't load the sound file\n");
 
+    // RCS sound
+    int RCS_id = load_sound("assets/sfx/RCS.wav");
+
     // creating an entity
     // sprites[0] = (sprite_t){0, 0, 1, 1, background_texture};
     sprites[1] = (sprite_t){viewport_w / 2, viewport_h / 2, 100, 100, placeholder_texture}; // rocket
@@ -73,7 +76,8 @@ int main(){
 
     bool running = true;
 
-    play_sound(sound_id);
+    play_sound(sound_id, 1);
+    play_RCS_sound(RCS_id);
     
     // text
 
@@ -111,6 +115,12 @@ int main(){
 
         if (keys[SDL_SCANCODE_Q]) rocket_radial_acc -= (speed / 90.0f) * dt;
         if (keys[SDL_SCANCODE_E]) rocket_radial_acc += (speed / 90.0f) * dt;
+
+        if (keys[SDL_SCANCODE_W] || keys[SDL_SCANCODE_S] || keys[SDL_SCANCODE_A]
+        || keys[SDL_SCANCODE_D] || keys[SDL_SCANCODE_Q] || keys[SDL_SCANCODE_E]) resume_sound(RCS_id);
+        else pause_sound(RCS_id);
+
+        update_audio();
 
         sprites[1].x += rocket_acc_x; sprites[1].y += rocket_acc_y;
         sprites[1].r += rocket_radial_acc;
