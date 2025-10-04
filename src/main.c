@@ -15,6 +15,7 @@
 sprite_t sprites[MAX_ENTITIES];
 int viewport_w = 800, viewport_h = 600;
 
+float camera_pos_x = 0.0, camera_pos_y = 0.0;
 
 
 int main(){
@@ -54,7 +55,10 @@ int main(){
 
     // creating an entity
     sprites[0] = (sprite_t){0, 0, viewport_w, viewport_h, background_texture};
-    sprites[1] = (sprite_t){0, 0, 100, 100, placeholder_texture}; // rocket
+    sprites[1] = (sprite_t){viewport_w / 2, viewport_h / 2, 100, 100, placeholder_texture}; // rocket
+    sprites[2] = (sprite_t){100, 150, 50, 50, placeholder_texture};
+    sprites[3] = (sprite_t){300, 500, 50, 50, placeholder_texture};
+    sprites[4] = (sprite_t){500, 300, 50, 50, placeholder_texture};
 
     float rocket_acc_x = 0, rocket_acc_y = 0;
 
@@ -105,7 +109,9 @@ int main(){
 
         // draw_quad(sprite_shader, 0, 0, 0, viewport_w, viewport_h, viewport_w, viewport_h);
 
-        render_entities(sprites, 2, sprite_shader, viewport_w, viewport_h);
+        render_entities(sprites, 5, sprite_shader, viewport_w, viewport_h, camera_pos_x, camera_pos_y);
+
+        camera_pos_x = sprites[1].x - viewport_w + 100; camera_pos_y = sprites[1].y - viewport_h + 100;
         
         // glt example code
         gltBeginDraw();
