@@ -37,6 +37,10 @@ int main(){
     if (!placeholder_texture) printf("couldn't load the placeholder texture\n");
     // --
 
+    // main audio track
+    int sound_id = load_sound("assets/sfx/space.wav");  // Assume a "sound.wav" file exists in the working directory
+    if (sound_id < 0) printf("couldn't load the sound file\n");
+
     // creating an entity
     sprites[0] = (sprite_t){0, 0, 100, 100, placeholder_texture};
 
