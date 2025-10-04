@@ -151,9 +151,14 @@ void draw_quad(int shader_program, int texture,
     if (texLoc != -1) {
         glUniform1i(texLoc, 0);
     }
+
     int resolutionLoc = glGetUniformLocation(shader_program, "resolution");
     if (resolutionLoc != -1) {
         glUniform2f(resolutionLoc, viewport_w, viewport_h);
+    }
+    int timeLoc = glGetUniformLocation(shader_program, "time");
+    if (timeLoc != -1) {
+        glUniform1f(timeLoc, (float)SDL_GetTicks()/1000.0);
     }
 
     glActiveTexture(GL_TEXTURE0);

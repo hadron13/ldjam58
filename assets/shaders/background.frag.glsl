@@ -4,6 +4,7 @@ out vec4 FragColor;
 uniform sampler2D tex;
 
 uniform vec2 resolution;
+uniform float time;
 
 
 
@@ -206,8 +207,26 @@ void main() {
     vec3 color = vec3(0);
     vec3 ray_origin = vec3(0, 0, -20.0);
     vec3 ray_direction = ray_dir( 90.0, resolution.xy, gl_FragCoord.xy );
-    vec3 light_direction = normalize(vec3(4.0, 1.0, 0.0));
+    vec3 light_direction = normalize(vec3(sin(time/10.0), 0, cos(time/10.0)));
 
+
+
+
+    // magic number to match the raymarched scatter with the justinvented:tm: UV-based sphere
+    centered_uv *= 1.735; 
+
+    float center_dist = length(centered_uv);
+    float is_earth = step(center_dist, 1.0);
+
+    float normal = sqrt(1.0-(center_dist*center_dist));
+
+    if(isnan(normal)) normal = 0.0;
+    vec3 normal_vec = normalize(vec3(centered_uv, normal));
+
+    if(dot(ray_direction * vec3(-1.0, 1.0, 1.0), -light_direction) * (1.0 - is_earth) > 0.9995){
+		FragColor = vec4(1.0);
+        return;
+    }
 
     //scattering
     
@@ -223,18 +242,6 @@ void main() {
     vec3 scatter = in_scatter( ray_origin, ray_direction, e, light_direction * vec3(1.0, 1.0, -1.0) );
 
     ////////////
-    // magic number to match the raymarched scatter with the justinvented:tm: UV-based sphere
-    centered_uv *= 1.735; 
-
-    float center_dist = length(centered_uv);
-    float is_earth = step(center_dist, 1.0);
-
-    float normal = sqrt(1.0-(center_dist*center_dist));
-
-    if(isnan(normal)) normal = 0.0;
-    vec3 normal_vec = normalize(vec3(centered_uv, normal));
-
-
 
     //Texture/noise mapping
     vec2 terrain_noise_pos = centered_uv * 0.4 * (2.0-normal);
@@ -277,7 +284,7 @@ void main() {
     vec3 terrain_color = mix(water_color, ground_color, step(0.15, height));
 
     float diffuse_factor = max(0.0, dot(final_normal, light_direction));
-    diffuse_factor = max(diffuse_factor, length(scatter)/2.0);
+    diffuse_factor = min(diffuse_factor, length(scatter)*1.0);
 
 
     // vec2 a = ray_vs_sphere( ray_origin, ray_direction, R_INNER);
