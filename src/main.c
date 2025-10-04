@@ -108,7 +108,7 @@ int main(){
             1.0f,
             1.0f);
 
-        gltDrawText2DAligned(text2, 0.0f, (GLfloat)viewport_h, 1.0f, GLT_CENTER, GLT_CENTER);
+        gltDrawText2DAligned(text2, 0.0f, (GLfloat)viewport_h, 1.0f, GLT_LEFT, GLT_BOTTOM);
 
         gltEndDraw();
         // --
