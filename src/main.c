@@ -117,7 +117,7 @@ int main(){
         gltColor(1.0f, 1.0f, 1.0f, 1.0f);
         gltDrawText2D(text1, 0.0f, 0.0f, 1.0f); // x=0.0, y=0.0, scale=1.0
 
-        sprintf(str, "rocket accel: %.4f", abs(rocket_acc_x + rocket_acc_y));
+        sprintf(str, "rocket accel: %.4f", fabs(rocket_acc_x + rocket_acc_y));
         gltSetText(text2, str);
 
         gltColor(
