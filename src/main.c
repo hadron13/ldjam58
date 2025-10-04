@@ -46,7 +46,7 @@ int main(){
 
     
     int sprite_shader = shader_compile("assets/shaders/quad.vert.glsl", "assets/shaders/sprite.frag.glsl");    
-    int earth_shader = shader_compile("assets/shaders/quad.vert.glsl", "assets/shaders/earth.frag.glsl");
+    int background_shader = shader_compile("assets/shaders/quad.vert.glsl", "assets/shaders/background.frag.glsl");
 
     int background_texture = texture_load("assets/images/Space_Background1.png");
     int meteor0_texture = texture_load("assets/images/mETEOR1.png");
@@ -60,12 +60,13 @@ int main(){
     if (sound_id < 0) printf("couldn't load the sound file\n");
 
     // creating an entity
-    sprites[0] = (sprite_t){0, 0, viewport_w, viewport_h, background_texture};
+    // sprites[0] = (sprite_t){0, 0, 1, 1, background_texture};
     sprites[1] = (sprite_t){viewport_w / 2, viewport_h / 2, 100, 100, placeholder_texture}; // rocket
     sprites[2] = (sprite_t){100, 150, 50, 50, meteor0_texture};
     sprites[3] = (sprite_t){300, 500, 100, 50, meteor1_texture};
     sprites[4] = (sprite_t){500, 300, 50, 50, meteor2_texture};
     sprites[5] = (sprite_t){800, 100, 50, 50, meteor3_texture};
+
 
     float rocket_acc_x = 0, rocket_acc_y = 0;
     float rocket_radial_acc = 0;
@@ -75,13 +76,11 @@ int main(){
     play_sound(sound_id);
     
     // text
-    GLTtext *text1 = gltCreateText();
-    gltSetText(text1, "Hello World!");
 
     GLTtext *text2 = gltCreateText();
 
     double time;
-    char str[30];
+    char str[64];
 
     Uint32 last_time = SDL_GetTicks();
     float speed = 2.0f;
@@ -115,12 +114,14 @@ int main(){
 
         sprites[1].x += rocket_acc_x; sprites[1].y += rocket_acc_y;
         sprites[1].r += rocket_radial_acc;
-        sprites[0].x = camera_pos_x; sprites[0].y = camera_pos_y;
-        sprites[0].w = viewport_w; sprites[0].h = viewport_h;
+        // sprites[0].x = camera_pos_x; sprites[0].y = camera_pos_y;
+        // sprites[0].w = viewport_w; sprites[0].h = viewport_h;
 
         glClearColor(0.1, 0.1, 0.1, 1.0); 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        draw_quad(background_shader, 0, 0, 0, viewport_w, viewport_h, 0, viewport_w, viewport_h);
+        
         render_entities(sprites, 6, sprite_shader, viewport_w, viewport_h, camera_pos_x, camera_pos_y);
 
         camera_pos_x = sprites[1].x - viewport_w / 2.0f + 50.0f; camera_pos_y = sprites[1].y - viewport_h / 2.0f + 50.0f;
@@ -129,7 +130,7 @@ int main(){
         gltBeginDraw();
 
         gltColor(1.0f, 1.0f, 1.0f, 1.0f);
-        gltDrawText2D(text1, 0.0f, 0.0f, 1.0f); // x=0.0, y=0.0, scale=1.0
+        gltDrawText2D(text2, 0.0f, 0.0f, 1.0f); // x=0.0, y=0.0, scale=1.0
 
         sprintf(str, "rocket accel: %.4f | radial accel: %.4f", fabs(rocket_acc_x + rocket_acc_y), fabs(rocket_radial_acc));
         gltSetText(text2, str);
@@ -148,7 +149,6 @@ int main(){
         SDL_GL_SwapWindow(window);
     }
 
-    gltDeleteText(text1);
     gltDeleteText(text2);
     gltTerminate();
     

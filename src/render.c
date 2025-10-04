@@ -91,7 +91,6 @@ texture_t texture_load(const char *path) {
 
 extern int viewport_w, viewport_h;
 
-#include <cglm/cglm.h>
 
 static unsigned int VAO = 0;
 static unsigned int VBO = 0;
@@ -151,6 +150,10 @@ void draw_quad(int shader_program, int texture,
     int texLoc = glGetUniformLocation(shader_program, "tex");
     if (texLoc != -1) {
         glUniform1i(texLoc, 0);
+    }
+    int resolutionLoc = glGetUniformLocation(shader_program, "resolution");
+    if (resolutionLoc != -1) {
+        glUniform2f(resolutionLoc, viewport_w, viewport_h);
     }
 
     glActiveTexture(GL_TEXTURE0);
