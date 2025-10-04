@@ -81,11 +81,12 @@ texture_t texture_load(const char *path) {
 }
 
 static int VAO = 0, VBO = 0, EBO = 0;
-static int setupDone = 0;
+static int setup_done = 0;
 
-void draw_quad(int shader_program, int texture) {
-    if (!setupDone) {
+void draw_quad(int shader_program, int texture, float x, float y, float width, float height) {
+    if (!setup_done) {
         float vertices[] = {
+            // Positions     // Tex Coords (full UV)
             -1.0f,  1.0f,  0.0f, 1.0f,
             -1.0f, -1.0f,  0.0f, 0.0f,
              1.0f, -1.0f,  1.0f, 0.0f,
@@ -110,12 +111,27 @@ void draw_quad(int shader_program, int texture) {
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
         glEnableVertexAttribArray(1);
 
-        setupDone = 1;
+        setup_done = 1;
     }
 
     glUseProgram(shader_program);
-    int texLoc = glGetUniformLocation(shader_program, "placeholder_texture");
-    glUniform1i(texLoc, 0);
+    int texLoc = glGetUniformLocation(shader_program, "placeholder_texture");  // Or "ourTexture"?
+    if (texLoc != -1) {
+        glUniform1i(texLoc, 0);
+    }
+
+    // TODO: model matrix
+    //Mat4 model;
+    float window_width = 800.0f;   // Get from SDL_GetWindowSize(window, &ww, &wh);
+    float window_height = 600.0f;
+    //mat4_model(model, x, y, width, height, window_width, window_height);
+
+    int modelLoc = glGetUniformLocation(shader_program, "model");
+    /*if (modelLoc != -1) {
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, model);
+    } else {
+        printf("Warning: 'model' uniform not found!\n");
+    }*/
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
