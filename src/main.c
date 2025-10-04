@@ -2,6 +2,7 @@
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_video.h>
 #include <SDL3/SDL_timer.h>
+#include <SDL3/SDL_scancode.h>
 #include"glad/gl.h"
 #include"render.h"
 #include"entity.h"
@@ -53,7 +54,9 @@ int main(){
 
     // creating an entity
     sprites[0] = (sprite_t){0, 0, viewport_w, viewport_h, background_texture};
-    sprites[1] = (sprite_t){0, 0, 100, 100, placeholder_texture};
+    sprites[1] = (sprite_t){0, 0, 100, 100, placeholder_texture}; // rocket
+
+    float rocket_acc_x = 0, rocket_acc_y = 0;
 
     bool running = true;
 
@@ -67,9 +70,14 @@ int main(){
 
     double time;
     char str[30];
+
+    Uint32 last_time = SDL_GetTicks();
+    float speed = 20.0f;
     
     while(running){
-        time = SDL_GetTicks() / 1000.0;
+        Uint32 current_time = SDL_GetTicks();
+        float dt = (current_time - last_time) / 1000.0f;
+        last_time = current_time;
         SDL_Event event;
         while(SDL_PollEvent(&event)){
             switch(event.type){
@@ -83,6 +91,14 @@ int main(){
                     break;
             }
         }
+
+        const bool* keys = SDL_GetKeyboardState(NULL);
+        if (keys[SDL_SCANCODE_W]) rocket_acc_y += speed * dt;
+        if (keys[SDL_SCANCODE_S]) rocket_acc_y -= speed * dt;
+        if (keys[SDL_SCANCODE_A]) rocket_acc_x -= speed * dt;
+        if (keys[SDL_SCANCODE_D]) rocket_acc_x += speed * dt;
+
+        sprites[1].x += rocket_acc_x; sprites[1].y += rocket_acc_y;
 
         glClearColor(0.1, 0.1, 0.1, 1.0); 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
