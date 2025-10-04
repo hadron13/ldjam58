@@ -87,8 +87,10 @@ texture_t texture_load(const char *path) {
     return (texture_t)texture;
 }
 
-static int VAO = 0, VBO = 0, EBO = 0;
+static unsigned int VAO = 0, VBO = 0;
 static int setup_done = 0;
+
+extern int viewport_w, viewport_h;
 
 void draw_quad(int shader_program, int texture, float x, float y, float width, float height, float window_width, float window_height) {
     if (!setup_done) {
@@ -139,6 +141,11 @@ void draw_quad(int shader_program, int texture, float x, float y, float width, f
     int texLoc = glGetUniformLocation(shader_program, "tex");  
     if (texLoc != -1) {
         glUniform1i(texLoc, 0);
+    }
+    int resolutionLoc = glGetUniformLocation(shader_program, "tex");  
+
+    if(resolutionLoc != -1){
+        glUniform2f(resolutionLoc, viewport_w, viewport_h);
     }
 
     glActiveTexture(GL_TEXTURE0);

@@ -12,6 +12,7 @@
 #include <math.h>
 
 sprite_t sprites[MAX_ENTITIES];
+int viewport_w = 800, viewport_h = 600;
 
 
 
@@ -26,7 +27,6 @@ int main(){
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-    int viewport_w = 1280, viewport_h = 720;
     SDL_Window * window = SDL_CreateWindow("Garbage Collection !!!", viewport_w, viewport_h, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
 
     
@@ -97,8 +97,8 @@ int main(){
         gltDrawText2D(text1, 0.0f, 0.0f, 1.0f); // x=0.0, y=0.0, scale=1.0
 
         gltDrawText2DAligned(text1,
-            (GLfloat)(viewport_w / 2),
-            (GLfloat)(viewport_h / 2),
+            (GLfloat)(viewport_w / 2.0),
+            (GLfloat)(viewport_h / 2.0),
             3.0f,
             GLT_CENTER, GLT_CENTER);
 
