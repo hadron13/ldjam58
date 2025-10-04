@@ -41,12 +41,18 @@ int main(){
     gladLoadGL(SDL_GL_GetProcAddress);
 
     gltInit();
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     
     int sprite_shader = shader_compile("assets/shaders/quad.vert.glsl", "assets/shaders/sprite.frag.glsl");    
     int earth_shader = shader_compile("assets/shaders/quad.vert.glsl", "assets/shaders/earth.frag.glsl");
 
     int background_texture = texture_load("assets/images/Space_Background1.png");
+    int meteor0_texture = texture_load("assets/images/mETEOR1.png");
+    int meteor1_texture = texture_load("assets/images/mETEOR2.png");
+    int meteor2_texture = texture_load("assets/images/mETEOR3.png");
+    int meteor3_texture = texture_load("assets/images/mETEOR4.png");
     int placeholder_texture = texture_load("test.jpg");
 
     // main audio track
@@ -56,9 +62,10 @@ int main(){
     // creating an entity
     sprites[0] = (sprite_t){0, 0, viewport_w, viewport_h, background_texture};
     sprites[1] = (sprite_t){viewport_w / 2, viewport_h / 2, 100, 100, placeholder_texture}; // rocket
-    sprites[2] = (sprite_t){100, 150, 50, 50, placeholder_texture};
-    sprites[3] = (sprite_t){300, 500, 50, 50, placeholder_texture};
-    sprites[4] = (sprite_t){500, 300, 50, 50, placeholder_texture};
+    sprites[2] = (sprite_t){100, 150, 50, 50, meteor0_texture};
+    sprites[3] = (sprite_t){300, 500, 100, 50, meteor1_texture};
+    sprites[4] = (sprite_t){500, 300, 50, 50, meteor2_texture};
+    sprites[5] = (sprite_t){800, 100, 50, 50, meteor3_texture};
 
     float rocket_acc_x = 0, rocket_acc_y = 0;
     float rocket_radial_acc = 0;
@@ -114,9 +121,9 @@ int main(){
         glClearColor(0.1, 0.1, 0.1, 1.0); 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        render_entities(sprites, 5, sprite_shader, viewport_w, viewport_h, camera_pos_x, camera_pos_y);
+        render_entities(sprites, 6, sprite_shader, viewport_w, viewport_h, camera_pos_x, camera_pos_y);
 
-        camera_pos_x = sprites[1].x - viewport_w / 2.0f; camera_pos_y = sprites[1].y - viewport_h / 2.0f;
+        camera_pos_x = sprites[1].x - viewport_w / 2.0f + 50.0f; camera_pos_y = sprites[1].y - viewport_h / 2.0f + 50.0f;
         
         // glt example code
         gltBeginDraw();
