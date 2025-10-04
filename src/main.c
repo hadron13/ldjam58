@@ -84,7 +84,7 @@ int main(){
     char str[30];
 
     Uint32 last_time = SDL_GetTicks();
-    float speed = 20.0f;
+    float speed = 2.0f;
     
     while(running){
         Uint32 current_time = SDL_GetTicks();
@@ -110,8 +110,8 @@ int main(){
         if (keys[SDL_SCANCODE_A]) rocket_acc_x -= speed * dt;
         if (keys[SDL_SCANCODE_D]) rocket_acc_x += speed * dt;
 
-        if (keys[SDL_SCANCODE_Q]) rocket_radial_acc -= 0.1 * dt;
-        if (keys[SDL_SCANCODE_E]) rocket_radial_acc += 0.1 * dt;
+        if (keys[SDL_SCANCODE_Q]) rocket_radial_acc -= (speed / 90.0f) * dt;
+        if (keys[SDL_SCANCODE_E]) rocket_radial_acc += (speed / 90.0f) * dt;
 
         sprites[1].x += rocket_acc_x; sprites[1].y += rocket_acc_y;
         sprites[1].r += rocket_radial_acc;
