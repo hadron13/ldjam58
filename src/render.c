@@ -4,10 +4,10 @@
 #include <stdio.h>
 
 // TODO: hardcode the shaders
-static const char *vertexShader = "";
-static const char *fragmentShader = "";
+static const char *vertex_shader = "";
+static const char *fragment_shader = "";
 
-int compileShader() {
+int compile_shader() {
 
 }
 
@@ -19,6 +19,6 @@ int load_texture() {
 
 }
 
-void draw_quad(int shaderProgram, int texture) {
+void draw_quad(int shader_program, int texture) {
 
 }

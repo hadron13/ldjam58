@@ -2,7 +2,8 @@
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_video.h>
 #include"glad/gl.h"
-
+#include"render.h"
+#include<stdio.h>
 
 int main(){
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS);
@@ -23,6 +24,14 @@ int main(){
     
     gladLoadGL(SDL_GL_GetProcAddress);
 
+    // creating shader program and loading texture
+    int shader_program = create_shader_program();
+    if (!shader_program) printf("couldn't create shader program\n");
+
+    int placeholder_texture = load_texture("test.png");
+    if (!placeholder_texture) printf("couldn't load the placeholder texture\n");
+    // --
+
     bool running = true;
     
     while(running){
@@ -37,6 +46,9 @@ int main(){
 
         glClearColor(0.1, 0.1, 0.1, 1.0); 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // render
+        draw_quad(shader_program, placeholder_texture);
 
         SDL_GL_SwapWindow(window);
     }

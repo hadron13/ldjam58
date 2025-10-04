@@ -7,6 +7,6 @@
 // Render functions
 int create_shader_program();
 int load_texture(const char *path);
-void draw_quad(int shaderProgram, int texture);
+void draw_quad(int shader_program, int texture);
 
 #endif
