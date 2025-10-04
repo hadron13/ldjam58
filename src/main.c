@@ -42,15 +42,16 @@ int main(){
     int shader_program = shader_compile("assets/shaders/quad.vert.glsl", "assets/shaders/sprite.frag.glsl");
     if (!shader_program) printf("couldn't create shader program\n");
 
-    int placeholder_texture = texture_load("assets/images/Space_Background1.png");
-    if (!placeholder_texture) printf("couldn't load the placeholder texture\n");
+    int background_texture = texture_load("assets/images/Space_Background1.png");
+    int placeholder_texture = texture_load("test.jpg");
 
     // main audio track
     int sound_id = load_sound("assets/sfx/space.wav");
     if (sound_id < 0) printf("couldn't load the sound file\n");
 
     // creating an entity
-    sprites[0] = (sprite_t){0, 0, 100, 100, placeholder_texture};
+    sprites[0] = (sprite_t){0, 0, viewport_w, viewport_h, background_texture};
+    sprites[1] = (sprite_t){0, 0, 100, 100, placeholder_texture};
 
     bool running = true;
 
@@ -85,7 +86,7 @@ int main(){
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // render
-        render_entities(sprites, 1, shader_program, viewport_w, viewport_h);
+        render_entities(sprites, 2, shader_program, 800, 600);
         
         // glt example code
         gltBeginDraw();
