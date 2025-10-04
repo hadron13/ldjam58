@@ -111,7 +111,7 @@ int main(){
 
         render_entities(sprites, 5, sprite_shader, viewport_w, viewport_h, camera_pos_x, camera_pos_y);
 
-        camera_pos_x = sprites[1].x - viewport_w + 100; camera_pos_y = sprites[1].y - viewport_h + 100;
+        camera_pos_x = sprites[1].x - viewport_w / 2.0f; camera_pos_y = sprites[1].y - viewport_h / 2.0f;
         
         // glt example code
         gltBeginDraw();

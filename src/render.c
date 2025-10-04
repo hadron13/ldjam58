@@ -89,21 +89,26 @@ texture_t texture_load(const char *path) {
     return (texture_t)texture;
 }
 
-static unsigned int VAO = 0, VBO = 0;
-static int setup_done = 0;
-
 extern int viewport_w, viewport_h;
 
-void draw_quad(int shader_program, int texture, float x, float y, float width, float height, float window_width, float window_height) {
+#include <cglm/cglm.h>
+
+static unsigned int VAO = 0;
+static unsigned int VBO = 0;
+static int setup_done = 0;
+
+void draw_quad(int shader_program, int texture,
+                   float x, float y, float width, float height, float rotation_radians,
+                   float window_width, float window_height) {
     if (!setup_done) {
         float vertices[] = {
-            // Initial dummy data (will be overwritten)
-            -1.0f,  1.0f,  0.0f, 1.0f,
-            -1.0f, -1.0f,  0.0f, 0.0f,
-             1.0f, -1.0f,  1.0f, 0.0f,
-            -1.0f,  1.0f,  0.0f, 1.0f,
-             1.0f, -1.0f,  1.0f, 0.0f,
-             1.0f,  1.0f,  1.0f, 1.0f
+            0.0f, 1.0f,      0.0f, 0.0f,
+            0.0f, 0.0f,      0.0f, 1.0f,
+            1.0f, 0.0f,      1.0f, 1.0f,
+
+            0.0f, 1.0f,      0.0f, 0.0f,
+            1.0f, 0.0f,      1.0f, 1.0f,
+            1.0f, 1.0f,      1.0f, 0.0f
         };
 
         glGenVertexArrays(1, &VAO);
@@ -112,7 +117,7 @@ void draw_quad(int shader_program, int texture, float x, float y, float width, f
         glBindVertexArray(VAO);
 
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
         glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
         glEnableVertexAttribArray(0);
@@ -123,24 +128,34 @@ void draw_quad(int shader_program, int texture, float x, float y, float width, f
     }
 
     glUseProgram(shader_program);
-    
 
+    mat4 projection = GLM_MAT4_IDENTITY_INIT;
+    glm_ortho(0.0f, window_width, window_height, 0.0f, -1.0f, 1.0f, projection);
+
+    mat4 model = GLM_MAT4_IDENTITY_INIT;
+    glm_translate(model, (vec3){x, y, 0.0f});
+    glm_translate(model, (vec3){0.5f * width, 0.5f * height, 0.0f});
+    glm_rotate(model, rotation_radians, (vec3){0.0f, 0.0f, 1.0f});
+    glm_translate(model, (vec3){-0.5f * width, -0.5f * height, 0.0f});
+
+    glm_scale(model, (vec3){width, height, 1.0f});
+
+    mat4 transform;
+    glm_mat4_mul(projection, model, transform);
+
+    int transformLoc = glGetUniformLocation(shader_program, "transform");
+    if (transformLoc != -1) {
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, (float*)transform);
+    }
 
     int texLoc = glGetUniformLocation(shader_program, "tex");
     if (texLoc != -1) {
         glUniform1i(texLoc, 0);
     }
-    int resolutionLoc = glGetUniformLocation(shader_program, "resolution");  
-    if(resolutionLoc != -1){
-        glUniform2f(resolutionLoc, window_width, window_height);
-    }
-    int rectLoc= glGetUniformLocation(shader_program, "rect");  
-    if(rectLoc != -1){
-        glUniform4f(rectLoc, x, y, width, height);
-    }
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
+
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
