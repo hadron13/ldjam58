@@ -24,8 +24,11 @@ static char* fragment_shader = "#version 330 core\n"
 char *load_file(const char *path){
     FILE *file = fopen(path, "rb");
 
-    if (file == NULL) return NULL;
-
+    if (file == NULL){
+        // printf("error opening file %s", path);
+        perror("error");
+        return NULL;
+    }
     fseek(file, 0, SEEK_END);
     size_t file_size = ftell(file);
     fseek(file, 0, SEEK_SET);  
@@ -34,12 +37,18 @@ char *load_file(const char *path){
     fread(string, file_size, 1, file);
 
     string[file_size] = 0;
+    fclose(file);
     
     return string;
 }
 
 // helper
-int compile_shader(int type, const char *source) {
+int compile_shader(int type, const char *path) {
+    const char *source = load_file(path);
+    if(source == NULL){
+        return 0;
+    }
+
     int shader = glCreateShader(type);
     glShaderSource(shader, 1, &source, NULL);
     glCompileShader(shader);
@@ -55,13 +64,9 @@ int compile_shader(int type, const char *source) {
 }
 
 shader_t shader_compile(const char *vertex_path, const char *fragment_path){ 
-    // TODO: read files
 
-    char *vertex_source = (vertex_path == NULL)?vertex_shader : load_file(vertex_path);
-    char *fragment_source = (vertex_path == NULL)?fragment_shader : load_file(fragment_path);
-
-    int vertex = compile_shader(GL_VERTEX_SHADER, vertex_source);
-    int fragment = compile_shader(GL_FRAGMENT_SHADER, fragment_source);
+    int vertex = compile_shader(GL_VERTEX_SHADER, vertex_path);
+    int fragment = compile_shader(GL_FRAGMENT_SHADER, fragment_path);
 
     // link shader program
     int program = glCreateProgram();
