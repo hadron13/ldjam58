@@ -7,18 +7,15 @@
 static const char *vertex_shader = "";
 static const char *fragment_shader = "";
 
-int compile_shader(int shader_type, const char *source) {
 
+shader_t shader_compile(const char *vertex_path, const char *fragment_path){ 
+    return 0;
 }
 
-int create_shader_program() {
-
+texture_t texture_load(const char *path) {
+    return 0;
 }
 
-int load_texture(const char *path) {
-
-}
-
-void draw_quad(int shader_program, int texture) {
+void draw_quad(shader_t shader, texture_t texture) {
 
 }
