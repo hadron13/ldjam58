@@ -38,15 +38,12 @@ int main(){
 
     gltInit();
 
-    // creating shader program and loading texture
-    //                   shader path: using placeholder
     
     int shader_program = shader_compile("assets/shaders/quad.vert.glsl", "assets/shaders/sprite.frag.glsl");
     if (!shader_program) printf("couldn't create shader program\n");
 
     int placeholder_texture = texture_load("assets/images/Space_Background1.png");
     if (!placeholder_texture) printf("couldn't load the placeholder texture\n");
-    // --
 
     // main audio track
     int sound_id = load_sound("assets/sfx/space.wav");
