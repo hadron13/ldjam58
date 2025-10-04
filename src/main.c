@@ -85,7 +85,7 @@ int main(){
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // render
-        render_entities(sprites, 1, shader_program);
+        render_entities(sprites, 1, shader_program, viewport_w, viewport_h);
         
         // glt example code
         gltBeginDraw();

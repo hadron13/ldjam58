@@ -3,23 +3,6 @@
 #include "render.h"
 #include <stdio.h>
 
-static char* vertex_shader = "#version 330 core\n"
-    "layout (location = 0) in vec2 aPos;\n"
-    "layout (location = 1) in vec2 aTexCoord;\n"
-    "out vec2 TexCoord;\n"
-    "void main() {\n"
-    "    TexCoord = aTexCoord;\n"
-    "    gl_Position = vec4(aPos, 0.0, 1.0);\n"
-    "}\0";
-
-static char* fragment_shader = "#version 330 core\n"
-    "in vec2 TexCoord;\n"
-    "out vec4 FragColor;\n"
-    "uniform sampler2D placeholder_texture;\n"
-    "void main() {\n"
-    "    FragColor = texture(placeholder_texture, TexCoord);\n"
-    "}\0";
-
 
 char *load_file(const char *path){
     FILE *file = fopen(path, "rb");
@@ -107,10 +90,10 @@ texture_t texture_load(const char *path) {
 static int VAO = 0, VBO = 0, EBO = 0;
 static int setup_done = 0;
 
-void draw_quad(int shader_program, int texture, float x, float y, float width, float height) {
+void draw_quad(int shader_program, int texture, float x, float y, float width, float height, float window_width, float window_height) {
     if (!setup_done) {
         float vertices[] = {
-            // Positions     // Tex Coords (full UV)
+            // Initial dummy data (will be overwritten)
             -1.0f,  1.0f,  0.0f, 1.0f,
             -1.0f, -1.0f,  0.0f, 0.0f,
              1.0f, -1.0f,  1.0f, 0.0f,
@@ -125,8 +108,7 @@ void draw_quad(int shader_program, int texture, float x, float y, float width, f
         glBindVertexArray(VAO);
 
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
 
         glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
         glEnableVertexAttribArray(0);
@@ -136,24 +118,28 @@ void draw_quad(int shader_program, int texture, float x, float y, float width, f
         setup_done = 1;
     }
 
+    float left = (2.0f * x / window_width) - 1.0f;
+    float right = (2.0f * (x + width) / window_width) - 1.0f;
+    float bottom = (2.0f * y / window_height) - 1.0f;
+    float top = (2.0f * (y + height) / window_height) - 1.0f;
+
+    float vertices[] = {
+        left,  top,          0.0f, 1.0f,  // Top-left
+        left,  bottom,       0.0f, 0.0f,  // Bottom-left
+        right, bottom,       1.0f, 0.0f,  // Bottom-right
+        left,  top,          0.0f, 1.0f,  // Top-left
+        right, bottom,       1.0f, 0.0f,  // Bottom-right
+        right, top,          1.0f, 1.0f   // Top-right
+    };
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+
     glUseProgram(shader_program);
     int texLoc = glGetUniformLocation(shader_program, "tex");  
     if (texLoc != -1) {
         glUniform1i(texLoc, 0);
     }
-
-    // TODO: model matrix
-    //Mat4 model;
-    float window_width = 800.0f;   // Get from SDL_GetWindowSize(window, &ww, &wh);
-    float window_height = 600.0f;
-    //mat4_model(model, x, y, width, height, window_width, window_height);
-
-    int modelLoc = glGetUniformLocation(shader_program, "model");
-    /*if (modelLoc != -1) {
-        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, model);
-    } else {
-        printf("Warning: 'model' uniform not found!\n");
-    }*/
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);

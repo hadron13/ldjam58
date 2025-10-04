@@ -11,6 +11,6 @@ typedef struct {
     int texture;
 } sprite_t;
 
-void render_entities(const sprite_t sprites[MAX_ENTITIES], int count, int shader_program);
+void render_entities(const sprite_t sprites[MAX_ENTITIES], int count, int shader_program, float window_w, float window_h);
 
 #endif
