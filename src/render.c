@@ -175,7 +175,7 @@ void draw_quad(int shader_program, int texture, int normal_tex,
 
     int rotationLoc = glGetUniformLocation(shader_program, "rotation");
     if (rotationLoc != -1) {
-        glUniform1f(rotationLoc, (float)SDL_GetTicks()/1000.0);
+        glUniform1f(rotationLoc, rotation_radians);
     }
 
 

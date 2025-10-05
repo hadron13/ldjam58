@@ -66,6 +66,7 @@ void game_state(float dt, int *current_state) {
 
     sprites[1].x += rocket_acc_x; sprites[1].y += rocket_acc_y;
     sprites[1].r += rocket_radial_acc;
+    sprites[5].r += rocket_radial_acc;
 
     glClearColor(0.1, 0.1, 0.1, 1.0); 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
