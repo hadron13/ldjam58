@@ -22,6 +22,11 @@ void main() {
 
     float diffuse_factor = clamp(dot(normal, light_direction) * 2.0, 0, 1.0);
 
-    FragColor = texture(tex, TexCoord) * vec4(vec3(diffuse_factor + 0.2 ), 1.0);
+    vec4 color = texture(tex, TexCoord) * vec4(vec3(diffuse_factor + 0.1 ), 1.0);
+    if(hasNormal == 1){
+        FragColor = vec4(pow(color.rgb, vec3(0.4545)), color.a); 
+    }else{
+        FragColor = vec4(color);
+    }
     // FragColor = vec4(normal, 1.0);
 };

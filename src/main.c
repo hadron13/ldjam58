@@ -172,7 +172,7 @@ int main(){
 
     RCS_id = load_sound("assets/sfx/RCS.wav");
 
-    sprites[1] = (sprite_t){viewport_w / 2.0, viewport_h / 2.0, 192, 108, 120, 40, 75, rocket_albedo_texture, rocket_normal_texture};
+    sprites[1] = (sprite_t){viewport_w / 2.0, viewport_h / 2.0, 512, 512, 120, 40, 75, rocket_albedo_texture, rocket_normal_texture};
     //sprites[2] = (sprite_t){100, 150, 50, 50, 0, 0, 25, meteor0_texture};
     //sprites[3] = (sprite_t){300, 500, 100, 50, 0, 0, 25, meteor1_texture};
     //sprites[4] = (sprite_t){500, 300, 50, 50, 0, 0, 25, meteor2_texture};
