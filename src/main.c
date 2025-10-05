@@ -55,6 +55,8 @@ int main(){
     int meteor3_texture = texture_load("assets/images/mETEOR4.png");
     int asteroid_albedo_texture = texture_load("assets/images/asteroid_albedo.png");
     int asteroid_normal_texture = texture_load("assets/images/asteroid_normal.png");
+    int rocket_albedo_texture = texture_load("assets/images/rocket_albedo.png");
+    int rocket_normal_texture = texture_load("assets/images/rocket_normal.png");
     int placeholder_texture = texture_load("test.jpg");
 
     // main audio track
@@ -66,7 +68,7 @@ int main(){
 
     // creating an entity
     // sprites[0] = (sprite_t){0, 0, 1, 1, background_texture};
-    sprites[1] = (sprite_t){viewport_w / 2.0, viewport_h / 2.0, 100, 100, 75, placeholder_texture}; // rocket
+    sprites[1] = (sprite_t){viewport_w / 2.0, viewport_h / 2.0, 192, 108, 75, rocket_albedo_texture, rocket_normal_texture}; // rocket
     sprites[2] = (sprite_t){100, 150, 50, 50, 50, meteor0_texture};
     sprites[3] = (sprite_t){300, 500, 100, 50, 50, meteor1_texture};
     sprites[4] = (sprite_t){500, 300, 50, 50, 50, meteor2_texture};
