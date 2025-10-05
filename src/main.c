@@ -66,11 +66,11 @@ int main(){
 
     // creating an entity
     // sprites[0] = (sprite_t){0, 0, 1, 1, background_texture};
-    sprites[1] = (sprite_t){viewport_w / 2.0, viewport_h / 2.0, 100, 100, placeholder_texture}; // rocket
-    sprites[2] = (sprite_t){100, 150, 50, 50, meteor0_texture};
-    sprites[3] = (sprite_t){300, 500, 100, 50, meteor1_texture};
-    sprites[4] = (sprite_t){500, 300, 50, 50, meteor2_texture};
-    sprites[5] = (sprite_t){800, 100, 200, 200, asteroid_albedo_texture, asteroid_normal_texture};
+    sprites[1] = (sprite_t){viewport_w / 2.0, viewport_h / 2.0, 100, 100, 75, placeholder_texture}; // rocket
+    sprites[2] = (sprite_t){100, 150, 50, 50, 50, meteor0_texture};
+    sprites[3] = (sprite_t){300, 500, 100, 50, 50, meteor1_texture};
+    sprites[4] = (sprite_t){500, 300, 50, 50, 50, meteor2_texture};
+    sprites[5] = (sprite_t){800, 100, 200, 200, 130, asteroid_albedo_texture, asteroid_normal_texture};
     // sprites[6] = (sprite_t){400, 200, 50, 50, asteroid_albedo_texture};
 
 
@@ -84,10 +84,12 @@ int main(){
     
     // text
 
+    GLTtext *text1 = gltCreateText();
     GLTtext *text2 = gltCreateText();
 
     double time;
     char str[64];
+    char str2[64];
 
     Uint32 last_time = SDL_GetTicks();
     float speed = 2.0f;
@@ -136,17 +138,20 @@ int main(){
         draw_quad(background_shader, 0, 0, 0, 0, viewport_w, viewport_h, 0, viewport_w, viewport_h);
         
         render_entities(sprites, 6, sprite_shader, viewport_w, viewport_h, camera_pos_x, camera_pos_y);
+        int is_rocket_colliding = is_colliding(sprites, 6);
 
         camera_pos_x = sprites[1].x - viewport_w / 2.0f + 50.0f; camera_pos_y = sprites[1].y - viewport_h / 2.0f + 50.0f;
         
         // glt example code
         gltBeginDraw();
 
-        gltColor(1.0f, 1.0f, 1.0f, 1.0f);
-        gltDrawText2D(text2, 0.0f, 0.0f, 1.0f); // x=0.0, y=0.0, scale=1.0
-
         sprintf(str, "rocket accel: %.4f | radial accel: %.4f", fabs(rocket_acc_x + rocket_acc_y), fabs(rocket_radial_acc));
+        sprintf(str2, "rocket colliding: %i", is_rocket_colliding);
         gltSetText(text2, str);
+        gltSetText(text1, str2);
+        
+        gltColor(1.0f, 1.0f, 1.0f, 1.0f);
+        gltDrawText2D(text1, 0.0f, 0.0f, 1.0f); // x=0.0, y=0.0, scale=1.0
 
         gltColor(
             cosf((float)time) * 0.5f + 0.5f,
