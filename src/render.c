@@ -167,10 +167,17 @@ void draw_quad(int shader_program, int texture, int normal_tex,
     if (resolutionLoc != -1) {
         glUniform2f(resolutionLoc, viewport_w, viewport_h);
     }
+
     int timeLoc = glGetUniformLocation(shader_program, "time");
     if (timeLoc != -1) {
         glUniform1f(timeLoc, (float)SDL_GetTicks()/1000.0);
     }
+
+    int rotationLoc = glGetUniformLocation(shader_program, "rotation");
+    if (rotationLoc != -1) {
+        glUniform1f(rotationLoc, (float)SDL_GetTicks()/1000.0);
+    }
+
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);

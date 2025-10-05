@@ -17,7 +17,7 @@ void main() {
     }
 
 
-    float diffuse_factor = max(0.0, dot(normal, light_direction));
+    float diffuse_factor = clamp(dot(normal, light_direction) * 2.0, 0, 0.7);
 
-    FragColor = texture(tex, TexCoord) * vec4(vec3(diffuse_factor), 1.0);
+    FragColor = texture(tex, TexCoord) * vec4(vec3(diffuse_factor + 0.3), 1.0);
 };

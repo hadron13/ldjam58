@@ -7,6 +7,7 @@ out vec2 TexCoord;
 
 // We only need one uniform for all transformations!
 uniform mat4 transform;
+uniform float rotation;
 
 void main()
 {
