@@ -6,12 +6,40 @@ void render_entities(const sprite_t sprites[MAX_ENTITIES], int count, int shader
     }
 }
 
+static inline void rotate_point(float *x, float *y, float angle) {
+    float cs = cosf(angle);
+    float sn = sinf(angle);
+    float px = *x, py = *y;
+    *x = px * cs - py * sn;
+    *y = px * sn + py * cs;
+}
+
 int is_colliding(const sprite_t sprites[MAX_ENTITIES], int count) {
+    float rocket_cx = sprites[1].x + sprites[1].w / 2.0f;
+    float rocket_cy = sprites[1].y + sprites[1].h / 2.0f;
+    float half_w = sprites[1].c_w / 2.0f;
+    float half_h = sprites[1].c_h / 2.0f;
+    float angle = sprites[1].r; // in radians
+
     for (int i = 2; i < count; ++i) {
-        float radius = sprites[i].c_radius;
-        vec2 pos = {sprites[i].x + sprites[i].w / 2, sprites[i].y + sprites[i].h / 2};
-        vec2 rocket_pos = {sprites[1].x + sprites[1].w / 2, sprites[1].y + sprites[1].h / 2};
-        if (glm_vec2_distance(pos, rocket_pos) < radius) return true;
+        float circle_x = sprites[i].x + sprites[i].w / 2.0f;
+        float circle_y = sprites[i].y + sprites[i].h / 2.0f;
+        float radius   = sprites[i].c_radius;
+
+        float local_x = circle_x - rocket_cx;
+        float local_y = circle_y - rocket_cy;
+        rotate_point(&local_x, &local_y, -angle);
+
+        float closest_x = fmaxf(-half_w, fminf(local_x, half_w));
+        float closest_y = fmaxf(-half_h, fminf(local_y, half_h));
+
+        float dx = local_x - closest_x;
+        float dy = local_y - closest_y;
+        float dist_sq = dx*dx + dy*dy;
+
+        if (dist_sq < radius * radius) {
+            return true;
+        }
     }
 
     return false;

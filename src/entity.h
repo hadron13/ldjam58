@@ -8,6 +8,7 @@
 typedef struct {
     float x, y;
     float w, h;
+    float c_w, c_h;
     float c_radius;
     int texture;
     int normal_texture;

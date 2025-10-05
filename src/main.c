@@ -68,11 +68,11 @@ int main(){
 
     // creating an entity
     // sprites[0] = (sprite_t){0, 0, 1, 1, background_texture};
-    sprites[1] = (sprite_t){viewport_w / 2.0, viewport_h / 2.0, 192, 108, 75, rocket_albedo_texture, rocket_normal_texture}; // rocket
-    sprites[2] = (sprite_t){100, 150, 50, 50, 50, meteor0_texture};
-    sprites[3] = (sprite_t){300, 500, 100, 50, 50, meteor1_texture};
-    sprites[4] = (sprite_t){500, 300, 50, 50, 50, meteor2_texture};
-    sprites[5] = (sprite_t){800, 100, 200, 200, 130, asteroid_albedo_texture, asteroid_normal_texture};
+    sprites[1] = (sprite_t){viewport_w / 2.0, viewport_h / 2.0, 192, 108, 120, 40, 75, rocket_albedo_texture, rocket_normal_texture}; // rocket
+    sprites[2] = (sprite_t){100, 150, 50, 50, 0, 0, 25, meteor0_texture};
+    sprites[3] = (sprite_t){300, 500, 100, 50, 0, 0, 25, meteor1_texture};
+    sprites[4] = (sprite_t){500, 300, 50, 50, 0, 0, 25, meteor2_texture};
+    sprites[5] = (sprite_t){800, 100, 200, 200, 0, 0, 70, asteroid_albedo_texture, asteroid_normal_texture};
     // sprites[6] = (sprite_t){400, 200, 50, 50, asteroid_albedo_texture};
 
 
