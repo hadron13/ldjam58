@@ -9,6 +9,7 @@ typedef struct {
     float x, y;
     float w, h;
     int texture;
+    int normal_texture;
     float r;
 } sprite_t;
 

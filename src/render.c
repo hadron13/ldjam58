@@ -96,7 +96,7 @@ static unsigned int VAO = 0;
 static unsigned int VBO = 0;
 static int setup_done = 0;
 
-void draw_quad(int shader_program, int texture,
+void draw_quad(int shader_program, int texture, int normal_tex,
                    float x, float y, float width, float height, float rotation_radians,
                    float window_width, float window_height) {
     if (!setup_done) {
@@ -151,6 +151,17 @@ void draw_quad(int shader_program, int texture,
     if (texLoc != -1) {
         glUniform1i(texLoc, 0);
     }
+    int hasNormalLoc = glGetUniformLocation(shader_program, "hasNormal");
+    if(hasNormalLoc != 0){
+        glUniform1i(hasNormalLoc, normal_tex == 0? 0 : 1);
+    } 
+
+    if(normal_tex != 0){
+        int normalLoc = glGetUniformLocation(shader_program, "normalMap");
+        if (normalLoc != -1) {
+            glUniform1i(normalLoc, 1);
+        }
+    }
 
     int resolutionLoc = glGetUniformLocation(shader_program, "resolution");
     if (resolutionLoc != -1) {
@@ -163,6 +174,8 @@ void draw_quad(int shader_program, int texture,
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, normal_tex);
 
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);

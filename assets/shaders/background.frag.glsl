@@ -59,7 +59,7 @@ const float R_INNER = 10.0;
 const float R = R_INNER + 1.0;
 
 const int NUM_OUT_SCATTER = 8;
-const int NUM_IN_SCATTER = 80;
+const int NUM_IN_SCATTER = 40;
 
 float density( vec3 p, float ph ) {
 	return exp( -max( length( p ) - R_INNER, 0.0 ) / ph );

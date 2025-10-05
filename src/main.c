@@ -53,6 +53,8 @@ int main(){
     int meteor1_texture = texture_load("assets/images/mETEOR2.png");
     int meteor2_texture = texture_load("assets/images/mETEOR3.png");
     int meteor3_texture = texture_load("assets/images/mETEOR4.png");
+    int asteroid_albedo_texture = texture_load("assets/images/asteroid_albedo.png");
+    int asteroid_normal_texture = texture_load("assets/images/asteroid_normal.png");
     int placeholder_texture = texture_load("test.jpg");
 
     // main audio track
@@ -64,11 +66,12 @@ int main(){
 
     // creating an entity
     // sprites[0] = (sprite_t){0, 0, 1, 1, background_texture};
-    sprites[1] = (sprite_t){viewport_w / 2, viewport_h / 2, 100, 100, placeholder_texture}; // rocket
+    sprites[1] = (sprite_t){viewport_w / 2.0, viewport_h / 2.0, 100, 100, placeholder_texture}; // rocket
     sprites[2] = (sprite_t){100, 150, 50, 50, meteor0_texture};
     sprites[3] = (sprite_t){300, 500, 100, 50, meteor1_texture};
     sprites[4] = (sprite_t){500, 300, 50, 50, meteor2_texture};
-    sprites[5] = (sprite_t){800, 100, 50, 50, meteor3_texture};
+    sprites[5] = (sprite_t){800, 100, 200, 200, asteroid_albedo_texture, asteroid_normal_texture};
+    // sprites[6] = (sprite_t){400, 200, 50, 50, asteroid_albedo_texture};
 
 
     float rocket_acc_x = 0, rocket_acc_y = 0;
@@ -130,7 +133,7 @@ int main(){
         glClearColor(0.1, 0.1, 0.1, 1.0); 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        draw_quad(background_shader, 0, 0, 0, viewport_w, viewport_h, 0, viewport_w, viewport_h);
+        draw_quad(background_shader, 0, 0, 0, 0, viewport_w, viewport_h, 0, viewport_w, viewport_h);
         
         render_entities(sprites, 6, sprite_shader, viewport_w, viewport_h, camera_pos_x, camera_pos_y);
 
