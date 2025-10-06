@@ -17,13 +17,12 @@ extern int num_sounds;
 extern SDL_AudioStream* audio_stream;
 extern SDL_AudioSpec audio_spec;
 
-int init_audio(void);
+int init_audio(SDL_AudioSpec audio_spec, SDL_AudioStream *audio_stream);
 void cleanup_audio(void);
-int load_sound(const char* filename);
-void play_sound(int id, int loop);
-void play_RCS_sound(int id);
-void pause_sound(int id);
-void resume_sound(int id);
-void update_audio(void);
+int load_sound(const char* filename, SDL_AudioSpec audio_spec);
+void play_sound(int id, int loop, SDL_AudioStream *audio_stream);
+void pause_sound(int id, SDL_AudioStream *audio_stream);
+void resume_sound(int id, SDL_AudioStream *audio_stream);
+void update_audio(SDL_AudioStream *audio_stream);
 
 #endif

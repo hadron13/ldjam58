@@ -5,39 +5,20 @@
 
 sound_t sounds[MAX_SOUNDS];
 int num_sounds = 0;
-SDL_AudioStream* audio_stream = NULL;
-SDL_AudioStream* RCS_stream = NULL;
-SDL_AudioSpec audio_spec;
 
-int init_audio(void) {
+int init_audio(SDL_AudioSpec audio_spec, SDL_AudioStream *audio_stream) {
     SDL_zero(audio_spec);
     audio_spec.freq = 44100;
     audio_spec.format = SDL_AUDIO_S16;
     audio_spec.channels = 2;
 
     audio_stream = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &audio_spec, NULL, NULL);
-    RCS_stream = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &audio_spec, NULL, NULL);
 
     SDL_ResumeAudioStreamDevice(audio_stream);
-    SDL_ResumeAudioStreamDevice(RCS_stream);
     return 0;
 }
 
-void cleanup_audio(void) {
-    if (audio_stream) {
-        SDL_DestroyAudioStream(audio_stream);
-        audio_stream = NULL;
-    }
-    for (int i = 0; i < num_sounds; i++) {
-        if (sounds[i].data) {
-            SDL_free(sounds[i].data);
-            sounds[i].data = NULL;
-        }
-    }
-    num_sounds = 0;
-}
-
-int load_sound(const char* filename) {
+int load_sound(const char* filename, SDL_AudioSpec audio_spec) {
     if (num_sounds >= MAX_SOUNDS) {
         printf("Max sounds reached\n");
         return -1;
@@ -68,7 +49,7 @@ int load_sound(const char* filename) {
     return num_sounds++;
 }
 
-void play_sound(int id, int loop) {
+void play_sound(int id, int loop, SDL_AudioStream *audio_stream) {
     if (id < 0 || id >= num_sounds || !sounds[id].data) {
         return;
     }
@@ -78,35 +59,26 @@ void play_sound(int id, int loop) {
     sounds[id].looping = loop;
 }
 
-void play_RCS_sound(int id) {
-    if (id < 0 || id >= num_sounds || !sounds[id].data) {
-        return;
-    }
-    SDL_PutAudioStreamData(RCS_stream, sounds[id].data, sounds[id].len);
-
-    sounds[id].position = 0;
-    sounds[id].looping = true;
-}
-
 static bool RCS_paused = false;
 
-void pause_sound(int id) {
+void pause_sound(int id, SDL_AudioStream *audio_stream) {
     if (RCS_paused) return;
     RCS_paused = true;
-    SDL_AudioDeviceID dev = SDL_GetAudioStreamDevice(RCS_stream);
+    SDL_AudioDeviceID dev = SDL_GetAudioStreamDevice(audio_stream);
     if (dev != 0) {
         SDL_PauseAudioDevice(dev);
     }
 }
-void resume_sound(int id) {
+
+void resume_sound(int id, SDL_AudioStream *audio_stream) {
     if (!RCS_paused) return;
     RCS_paused = false;
-    SDL_ResumeAudioStreamDevice(RCS_stream);
+    SDL_ResumeAudioStreamDevice(audio_stream);
 }
 
 // unsafe nuclear explosions generator \/
-void update_audio(void) {
-    if (!RCS_stream) return;
+void update_audio(SDL_AudioStream *audio_stream) {
+    if (!audio_stream) return;
 
     const int samples_per_chunk = 4096;
     const int bytes_per_sample = SDL_AUDIO_BITSIZE(audio_spec.format) / 8 * audio_spec.channels;
@@ -148,6 +120,6 @@ void update_audio(void) {
         s->position += to_copy;
     }
 
-    SDL_PutAudioStreamData(RCS_stream, mix_buffer, buffer_size);
+    SDL_PutAudioStreamData(audio_stream, mix_buffer, buffer_size);
     SDL_free(mix_buffer);
 }
