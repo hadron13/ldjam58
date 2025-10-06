@@ -58,7 +58,7 @@ void spawn_asteroid() {
             float size = rand() % 200;
             float w = 100 + size;
             float h = 100 + size;
-            sprites[i] = (sprite_t){px, py, w, h, 0, 0, w / 2.86f, asteroid_albedo_texture, asteroid_normal_texture};
+            sprites[i] = (sprite_t){px, py, w, h, 0, 0, w / 2.86f, 1.0, asteroid_albedo_texture, asteroid_normal_texture};
             asteroid_data[i].vx = ((float)rand() / RAND_MAX - 0.5f) * 100.0f;
             asteroid_data[i].vy = ((float)rand() / RAND_MAX - 0.5f) * 100.0f;
             asteroid_data[i].active = 1;
@@ -96,7 +96,7 @@ void menu_state(float dt, int *current_state) {
     glClearColor(0.1, 0.1, 0.1, 1.0); 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    draw_quad(background_shader, 0, 0, 0, 0, viewport_w, viewport_h, 0, viewport_w, viewport_h);
+    draw_quad(background_shader, 0, 0, 0, 0, viewport_w, viewport_h, 0, 0, viewport_w, viewport_h);
 
     gltBeginDraw();
 
@@ -166,10 +166,17 @@ void game_state(float dt, int *current_state) {
     glClearColor(0.1, 0.1, 0.1, 1.0); 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    draw_quad(background_shader, 0, 0, 0, 0, viewport_w, viewport_h, 0, viewport_w, viewport_h);
+    draw_quad(background_shader, 0, 0, 0, 0, viewport_w, viewport_h, 0, 0, viewport_w, viewport_h);
     
     render_entities(sprites, MAX_ENTITIES, sprite_shader, viewport_w, viewport_h, camera_pos_x, camera_pos_y);
-    if (engine_on) draw_quad(sprite_shader, rocket_flame.texture, rocket_flame.normal_texture, rocket_flame.x - camera_pos_x, rocket_flame.y - camera_pos_y, rocket_flame.w, rocket_flame.h, rocket_flame.r, viewport_w, viewport_h);
+
+
+    if (engine_on){ 
+        rocket_flame.alpha = glm_lerp(rocket_flame.alpha,1.0, 0.01);
+        draw_quad(sprite_shader, rocket_flame.texture, rocket_flame.normal_texture, rocket_flame.x - camera_pos_x, rocket_flame.y - camera_pos_y, rocket_flame.w, rocket_flame.h, rocket_flame.r, rocket_flame.alpha, viewport_w, viewport_h);
+    }else{
+        rocket_flame.alpha = 0.0;
+    }
     int is_rocket_colliding = is_colliding(sprites, MAX_ENTITIES);
 
     camera_pos_x = sprites[1].x - viewport_w / 2.0f + 256.0f; camera_pos_y = sprites[1].y - viewport_h / 2.0f + 256.0f;
@@ -216,7 +223,7 @@ void game_over_state(float dt, int *current_state) {
     glClearColor(0.1, 0.1, 0.1, 1.0); 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    draw_quad(background_shader, 0, 0, 0, 0, viewport_w, viewport_h, 0, viewport_w, viewport_h);
+    draw_quad(background_shader, 0, 0, 0, 0, viewport_w, viewport_h, 0, 1.0, viewport_w, viewport_h);
 
     gltBeginDraw();
 
@@ -276,9 +283,9 @@ int main(){
 
     RCS_id = load_sound("assets/sfx/RCS.wav");
 
-    rocket_flame = (sprite_t){viewport_w / 2.0, viewport_h / 2.0, 150, 500, 0, 0, 0, flame_albedo_texture};
-    sprites[1] = (sprite_t){viewport_w / 2.0, viewport_h / 2.0, 512, 512, 440, 105, 75, rocket_albedo_texture, rocket_normal_texture};
-    sprites[5] = (sprite_t){800, 100, 200, 200, 0, 0, 70, asteroid_albedo_texture, asteroid_normal_texture};
+    rocket_flame = (sprite_t){viewport_w / 2.0, viewport_h / 2.0, 150, 500, 0, 0, 0, 1.0, flame_albedo_texture};
+    sprites[1] = (sprite_t){viewport_w / 2.0, viewport_h / 2.0, 512, 512, 440, 105, 75, 1.0, rocket_albedo_texture, rocket_normal_texture};
+    sprites[5] = (sprite_t){800, 100, 200, 200, 0, 0, 70, 1.0, asteroid_albedo_texture, asteroid_normal_texture};
 
     bool running = true;
 

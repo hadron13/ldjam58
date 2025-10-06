@@ -98,6 +98,7 @@ static int setup_done = 0;
 
 void draw_quad(int shader_program, int texture, int normal_tex,
                    float x, float y, float width, float height, float rotation_radians,
+                   float alpha,
                    float window_width, float window_height) {
     if (!setup_done) {
         float vertices[] = {
@@ -171,6 +172,11 @@ void draw_quad(int shader_program, int texture, int normal_tex,
     int timeLoc = glGetUniformLocation(shader_program, "time");
     if (timeLoc != -1) {
         glUniform1f(timeLoc, (float)SDL_GetTicks()/1000.0);
+    }
+   
+    int alphaLoc = glGetUniformLocation(shader_program, "alpha");
+    if (alphaLoc != -1) {
+        glUniform1f(alphaLoc, alpha);
     }
 
     int rotationLoc = glGetUniformLocation(shader_program, "rotation");

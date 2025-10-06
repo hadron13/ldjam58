@@ -10,6 +10,7 @@ typedef struct {
     float w, h;
     float c_w, c_h;
     float c_radius;
+    float alpha;
     int texture;
     int normal_texture;
     float r;

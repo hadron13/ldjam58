@@ -5,6 +5,7 @@ in vec3 BiTangent;
 out vec4 FragColor;
 
 uniform float time;
+uniform float alpha;
 uniform sampler2D tex;
 uniform sampler2D normalMap;
 uniform vec2 resolution;
@@ -25,8 +26,8 @@ void main() {
     vec4 color = texture(tex, TexCoord);
     if(hasNormal == 1){
         color *=  vec4(vec3(diffuse_factor + 0.1 ), 1.0);
-        FragColor = vec4(pow(color.rgb, vec3(0.4545)), color.a); 
+        FragColor = vec4(pow(color.rgb, vec3(0.4545)), color.a * alpha); 
     }else{
-        FragColor = vec4(color);
+        FragColor = vec4(color.rgb, color.a * alpha);
     }
 };
