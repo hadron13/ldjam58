@@ -420,7 +420,7 @@ int main(){
                         }
                     }
                     break;
-                case SDL_EVENT_KEY_UP:
+                 case SDL_EVENT_KEY_UP:
                     if (!event.key.repeat) {
                         if (event.key.key == SDLK_LSHIFT) {
                             engine_on = false;
