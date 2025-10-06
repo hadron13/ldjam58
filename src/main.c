@@ -38,8 +38,8 @@ GLTtext *text3;
 
 int engine_on = false;
 
-int asteroid_albedo_texture;
-int asteroid_normal_texture;
+int asteroid_albedo_textures[3];
+int asteroid_normal_textures[3];
 
 typedef struct {
     float vx, vy;
@@ -66,6 +66,9 @@ void spawn_asteroid() {
             float size = rand() % 200;
             float w = 100 + size;
             float h = 100 + size;
+            int rand_num = rand() % 3;
+            int asteroid_albedo_texture = asteroid_albedo_textures[rand_num];
+            int asteroid_normal_texture = asteroid_normal_textures[rand_num];
             sprites[i] = (sprite_t){px, py, w, h, 0, 0, w / 2.86f, 1.0, asteroid_albedo_texture, asteroid_normal_texture};
             asteroid_data[i].vx = rocket_acc_x;
             asteroid_data[i].vy = rocket_acc_y;
@@ -285,19 +288,31 @@ int main(){
     int meteor1_texture = texture_load("assets/images/mETEOR2.png");
     int meteor2_texture = texture_load("assets/images/mETEOR3.png");
     int meteor3_texture = texture_load("assets/images/mETEOR4.png");
-    asteroid_albedo_texture = texture_load("assets/images/asteroid_albedo.png");
-    asteroid_normal_texture = texture_load("assets/images/asteroid_normal.png");
+    int asteroid_albedo_texture1 = texture_load("assets/images/asteroid_albedo.png");
+    int asteroid_normal_texture1 = texture_load("assets/images/asteroid_normal.png");
+    int asteroid_albedo_texture2 = texture_load("assets/images/asteroid2_albedo.png");
+    int asteroid_normal_texture2 = texture_load("assets/images/asteroid2_normal.png");
+    int asteroid_albedo_texture3 = texture_load("assets/images/asteroid3_albedo.png");
+    int asteroid_normal_texture3 = texture_load("assets/images/asteroid3_normal.png");
     int rocket_albedo_texture = texture_load("assets/images/rocket_albedo.png");
     int rocket_normal_texture = texture_load("assets/images/rocket_normal.png");
     int flame_albedo_texture = texture_load("assets/images/rocketflame.png");
     int placeholder_texture = texture_load("test.jpg");
+
+    asteroid_albedo_textures[0] = asteroid_albedo_texture1;
+    asteroid_albedo_textures[1] = asteroid_albedo_texture2;
+    asteroid_albedo_textures[2] = asteroid_albedo_texture3;
+
+    asteroid_normal_textures[0] = asteroid_normal_texture1;
+    asteroid_normal_textures[1] = asteroid_normal_texture2;
+    asteroid_normal_textures[2] = asteroid_normal_texture3;
 
     background_id = load_sound("assets/sfx/space.wav", &background_spec);
     RCS_id = load_sound("assets/sfx/RCS.wav", &RCS_spec);
 
     rocket_flame = (sprite_t){viewport_w / 2.0, viewport_h / 2.0, 150, 500, 0, 0, 0, 1.0, flame_albedo_texture};
     sprites[1] = (sprite_t){viewport_w / 2.0, viewport_h / 2.0, 512, 512, 440, 105, 75, 1.0, rocket_albedo_texture, rocket_normal_texture};
-    sprites[5] = (sprite_t){800, 100, 200, 200, 0, 0, 70, 1.0, asteroid_albedo_texture, asteroid_normal_texture};
+    //sprites[5] = (sprite_t){800, 100, 200, 200, 0, 0, 70, 1.0, asteroid_albedo_texture, asteroid_normal_texture};
 
     bool running = true;
 
