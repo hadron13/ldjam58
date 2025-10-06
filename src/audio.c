@@ -49,11 +49,11 @@ int load_sound(const char* filename, SDL_AudioSpec *audio_spec) {
     return num_sounds++;
 }
 
-void play_sound(int id, int loop, SDL_AudioStream *audio_stream) {
+void play_sound(int id, int loop, SDL_AudioStream **audio_stream) {
     if (id < 0 || id >= num_sounds || !sounds[id].data) {
         return;
     }
-    SDL_PutAudioStreamData(audio_stream, sounds[id].data, sounds[id].len);
+    SDL_PutAudioStreamData(*audio_stream, sounds[id].data, sounds[id].len);
 
     sounds[id].position = 0;
     sounds[id].looping = loop;
@@ -61,27 +61,27 @@ void play_sound(int id, int loop, SDL_AudioStream *audio_stream) {
 
 static bool RCS_paused = false;
 
-void pause_sound(int id, SDL_AudioStream *audio_stream) {
+void pause_sound(int id, SDL_AudioStream **audio_stream) {
     if (RCS_paused) return;
     RCS_paused = true;
-    SDL_AudioDeviceID dev = SDL_GetAudioStreamDevice(audio_stream);
+    SDL_AudioDeviceID dev = SDL_GetAudioStreamDevice(*audio_stream);
     if (dev != 0) {
         SDL_PauseAudioDevice(dev);
     }
 }
 
-void resume_sound(int id, SDL_AudioStream *audio_stream) {
+void resume_sound(int id, SDL_AudioStream **audio_stream) {
     if (!RCS_paused) return;
     RCS_paused = false;
-    SDL_ResumeAudioStreamDevice(audio_stream);
+    SDL_ResumeAudioStreamDevice(*audio_stream);
 }
 
 // unsafe nuclear explosions generator \/
-void update_audio(SDL_AudioStream *audio_stream, SDL_AudioSpec audio_spec) {
-    if (!audio_stream) return;
+void update_audio(SDL_AudioStream **audio_stream, SDL_AudioSpec *audio_spec) {
+    if (!*audio_stream) return;
 
     const int samples_per_chunk = 4096;
-    const int bytes_per_sample = SDL_AUDIO_BITSIZE(audio_spec.format) / 8 * audio_spec.channels;
+    const int bytes_per_sample = SDL_AUDIO_BITSIZE(audio_spec->format) / 8 * audio_spec->channels;
     const int buffer_size = samples_per_chunk * bytes_per_sample;
 
     // Temp mixing buffer (16-bit signed audio)
@@ -120,6 +120,6 @@ void update_audio(SDL_AudioStream *audio_stream, SDL_AudioSpec audio_spec) {
         s->position += to_copy;
     }
 
-    SDL_PutAudioStreamData(audio_stream, mix_buffer, buffer_size);
+    SDL_PutAudioStreamData(*audio_stream, mix_buffer, buffer_size);
     SDL_free(mix_buffer);
 }

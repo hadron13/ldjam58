@@ -143,10 +143,10 @@ void game_state(float dt, int *current_state) {
 
     if ((keys[SDL_SCANCODE_W] || keys[SDL_SCANCODE_S] || keys[SDL_SCANCODE_A]
     || keys[SDL_SCANCODE_D] || keys[SDL_SCANCODE_Q] || keys[SDL_SCANCODE_E]) && rocket_fuel >= 0.0) {
-        resume_sound(RCS_id, RCS_stream);
+        resume_sound(RCS_id, &RCS_stream);
         rocket_fuel -= dt;
     }
-    else pause_sound(RCS_id, RCS_stream);
+    else pause_sound(RCS_id, &RCS_stream);
 
     if (engine_on) {
         rocket_acc_x += cos_r * speed * 10.0f * dt;
@@ -157,7 +157,8 @@ void game_state(float dt, int *current_state) {
 
     glm_clamp(rocket_fuel, 0.0, 100.0);
 
-    update_audio(RCS_stream, RCS_spec);
+    update_audio(&RCS_stream, &RCS_spec);
+    update_audio(&background_stream, &background_spec);
 
     sprites[1].x += rocket_acc_x; sprites[1].y += rocket_acc_y;
     sprites[1].r += rocket_radial_acc;
@@ -299,9 +300,9 @@ int main(){
 
     bool running = true;
 
-    play_sound(background_id, 1, background_stream);
-    play_sound(RCS_id, 1, RCS_stream);
-    pause_sound(RCS_id, RCS_stream);
+    play_sound(background_id, 1, &background_stream);
+    play_sound(RCS_id, 1, &RCS_stream);
+    pause_sound(RCS_id, &RCS_stream);
     
     text1 = gltCreateText();
     text2 = gltCreateText();
