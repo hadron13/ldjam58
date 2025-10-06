@@ -77,7 +77,7 @@ void resume_sound(int id, SDL_AudioStream *audio_stream) {
 }
 
 // unsafe nuclear explosions generator \/
-void update_audio(SDL_AudioStream *audio_stream) {
+void update_audio(SDL_AudioStream *audio_stream, SDL_AudioSpec audio_spec) {
     if (!audio_stream) return;
 
     const int samples_per_chunk = 4096;
