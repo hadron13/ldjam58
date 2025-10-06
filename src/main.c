@@ -245,8 +245,8 @@ int main(){
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS);
     srand(time(NULL));
 
-    init_audio(background_spec, background_stream);
-    init_audio(RCS_spec, RCS_stream);
+    init_audio(&background_spec, &background_stream);
+    init_audio(&RCS_spec, &RCS_stream);
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
@@ -283,9 +283,8 @@ int main(){
     int flame_albedo_texture = texture_load("assets/images/rocketflame.png");
     int placeholder_texture = texture_load("test.jpg");
 
-    int background_id = load_sound("assets/sfx/space.wav", background_spec);
-
-    RCS_id = load_sound("assets/sfx/RCS.wav", RCS_spec);
+    int background_id = load_sound("assets/sfx/space.wav", &background_spec);
+    RCS_id = load_sound("assets/sfx/RCS.wav", &RCS_spec);
 
     rocket_flame = (sprite_t){viewport_w / 2.0, viewport_h / 2.0, 150, 500, 0, 0, 0, 1.0, flame_albedo_texture};
     sprites[1] = (sprite_t){viewport_w / 2.0, viewport_h / 2.0, 512, 512, 440, 105, 75, 1.0, rocket_albedo_texture, rocket_normal_texture};

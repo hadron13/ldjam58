@@ -6,19 +6,19 @@
 sound_t sounds[MAX_SOUNDS];
 int num_sounds = 0;
 
-int init_audio(SDL_AudioSpec audio_spec, SDL_AudioStream *audio_stream) {
-    SDL_zero(audio_spec);
-    audio_spec.freq = 44100;
-    audio_spec.format = SDL_AUDIO_S16;
-    audio_spec.channels = 2;
+int init_audio(SDL_AudioSpec *audio_spec, SDL_AudioStream **audio_stream) {
+    SDL_zero(*audio_spec);
+    audio_spec->freq = 44100;
+    audio_spec->format = SDL_AUDIO_S16;
+    audio_spec->channels = 2;
 
-    audio_stream = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &audio_spec, NULL, NULL);
+    *audio_stream = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, audio_spec, NULL, NULL);
 
-    SDL_ResumeAudioStreamDevice(audio_stream);
+    SDL_ResumeAudioStreamDevice(*audio_stream);
     return 0;
 }
 
-int load_sound(const char* filename, SDL_AudioSpec audio_spec) {
+int load_sound(const char* filename, SDL_AudioSpec *audio_spec) {
     if (num_sounds >= MAX_SOUNDS) {
         printf("Max sounds reached\n");
         return -1;
@@ -34,7 +34,7 @@ int load_sound(const char* filename, SDL_AudioSpec audio_spec) {
 
     Uint8* converted_data = NULL;
     int converted_len = 0;
-    if (!SDL_ConvertAudioSamples(&loaded_spec, loaded_data, loaded_len, &audio_spec, &converted_data, &converted_len)) {
+    if (!SDL_ConvertAudioSamples(&loaded_spec, loaded_data, loaded_len, audio_spec, &converted_data, &converted_len)) {
         printf("Couldn't convert audio: %s\n", SDL_GetError());
         SDL_free(loaded_data);
         return -1;
