@@ -11,8 +11,11 @@
 #include"gl_text.h"
 #include <stdio.h>
 #include <math.h>
+#include <stdlib.h>
+#include <time.h>
 
 sprite_t sprites[MAX_ENTITIES];
+sprite_t rocket_flame;
 int viewport_w = 800, viewport_h = 600;
 
 float camera_pos_x = 0.0, camera_pos_y = 0.0;
@@ -23,11 +26,68 @@ int RCS_id;
 float rocket_acc_x = 0, rocket_acc_y = 0;
 float rocket_radial_acc = 0;
 float speed = 2.0f;
-double time = 0.0;
+double timer = 0.0;
 char str[64];
 char str2[64];
+char str3[64];
 GLTtext *text1;
 GLTtext *text2;
+GLTtext *text3;
+
+int engine_on = false;
+
+int asteroid_albedo_texture;
+int asteroid_normal_texture;
+
+typedef struct {
+    float vx, vy;
+    int active;
+} asteroid_data_t;
+
+asteroid_data_t asteroid_data[MAX_ENTITIES];
+
+int asteroid_count = 0;
+
+void spawn_asteroid() {
+    for (int i = 0; i < MAX_ENTITIES; i++) {
+        if (!asteroid_data[i].active && i != 1) {
+            float angle = ((float)rand() / RAND_MAX) * 2.0f * M_PI;
+            float dist = 1000.0f + ((float)rand() / RAND_MAX) * 500.0f;
+            float px = sprites[1].x + cosf(angle) * dist;
+            float py = sprites[1].y + sinf(angle) * dist;
+            float size = rand() % 200;
+            float w = 100 + size;
+            float h = 100 + size;
+            sprites[i] = (sprite_t){px, py, w, h, 0, 0, w / 2.86f, asteroid_albedo_texture, asteroid_normal_texture};
+            asteroid_data[i].vx = ((float)rand() / RAND_MAX - 0.5f) * 100.0f;
+            asteroid_data[i].vy = ((float)rand() / RAND_MAX - 0.5f) * 100.0f;
+            asteroid_data[i].active = 1;
+            asteroid_count++;
+            break;
+        }
+    }
+}
+
+void update_asteroids(float dt) {
+    for (int i = 0; i < MAX_ENTITIES; i++) {
+        if (asteroid_data[i].active && i != 1) {
+            sprites[i].x += asteroid_data[i].vx * dt;
+            sprites[i].y += asteroid_data[i].vy * dt;
+            float dx = sprites[i].x - sprites[1].x;
+            float dy = sprites[i].y - sprites[1].y;
+            float dist = sqrtf(dx * dx + dy * dy);
+            if (dist > 2500.0f) {
+                asteroid_data[i].active = 0;
+                asteroid_count--;
+            }
+        }
+    }
+    if (asteroid_count < 10) {
+        if (rand() % 100 < 5) {
+            spawn_asteroid();
+        }
+    }
+}
 
 void menu_state(float dt, int *current_state) {
     const bool* keys = SDL_GetKeyboardState(NULL);
@@ -50,10 +110,26 @@ void menu_state(float dt, int *current_state) {
 
 void game_state(float dt, int *current_state) {
     const bool* keys = SDL_GetKeyboardState(NULL);
-    if (keys[SDL_SCANCODE_W]) rocket_acc_y -= speed * dt;
-    if (keys[SDL_SCANCODE_S]) rocket_acc_y += speed * dt;
-    if (keys[SDL_SCANCODE_A]) rocket_acc_x -= speed * dt;
-    if (keys[SDL_SCANCODE_D]) rocket_acc_x += speed * dt;
+
+    float cos_r = cosf(sprites[1].r);
+    float sin_r = sinf(sprites[1].r);
+
+    if (keys[SDL_SCANCODE_W]) {
+        rocket_acc_x += cos_r * speed * dt;
+        rocket_acc_y += sin_r * speed * dt;
+    }
+    if (keys[SDL_SCANCODE_S]) {
+        rocket_acc_x -= cos_r * speed * dt;
+        rocket_acc_y -= sin_r * speed * dt;
+    }
+    if (keys[SDL_SCANCODE_A]) {
+        rocket_acc_x += -sin_r * speed * dt;
+        rocket_acc_y += cos_r * speed * dt;
+    }
+    if (keys[SDL_SCANCODE_D]) {
+        rocket_acc_x += sin_r * speed * dt;
+        rocket_acc_y += -cos_r * speed * dt;
+    }
 
     if (keys[SDL_SCANCODE_Q]) rocket_radial_acc -= (speed / 90.0f) * dt;
     if (keys[SDL_SCANCODE_E]) rocket_radial_acc += (speed / 90.0f) * dt;
@@ -62,25 +138,48 @@ void game_state(float dt, int *current_state) {
     || keys[SDL_SCANCODE_D] || keys[SDL_SCANCODE_Q] || keys[SDL_SCANCODE_E]) resume_sound(RCS_id);
     else pause_sound(RCS_id);
 
+    if (engine_on) {
+        rocket_acc_x += cos_r * speed * 10.0f * dt;
+        rocket_acc_y += sin_r * speed * 10.0f * dt;
+    }
+
     update_audio();
 
     sprites[1].x += rocket_acc_x; sprites[1].y += rocket_acc_y;
     sprites[1].r += rocket_radial_acc;
     sprites[5].r += rocket_radial_acc;
 
+    float flame_offset = (sprites[1].h / 2.0f) + (rocket_flame.h / 2.0f) - 45.0f;
+
+    float center_x = sprites[1].x + sprites[1].w / 2.0f;
+    float center_y = sprites[1].y + sprites[1].h / 2.0f;
+
+    float local_x = -flame_offset;
+    float local_y = 0.0f;
+
+    rocket_flame.x = center_x + cosf(sprites[1].r) * local_x - sinf(sprites[1].r) * local_y - rocket_flame.w / 2.0f;
+    rocket_flame.y = center_y + sinf(sprites[1].r) * local_x + cosf(sprites[1].r) * local_y - rocket_flame.h / 2.0f;
+    rocket_flame.r = sprites[1].r - 1.57f;
+
+    update_asteroids(dt);
+
     glClearColor(0.1, 0.1, 0.1, 1.0); 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     draw_quad(background_shader, 0, 0, 0, 0, viewport_w, viewport_h, 0, viewport_w, viewport_h);
     
-    render_entities(sprites, 6, sprite_shader, viewport_w, viewport_h, camera_pos_x, camera_pos_y);
-    int is_rocket_colliding = is_colliding(sprites, 6);
+    render_entities(sprites, MAX_ENTITIES, sprite_shader, viewport_w, viewport_h, camera_pos_x, camera_pos_y);
+    if (engine_on) draw_quad(sprite_shader, rocket_flame.texture, rocket_flame.normal_texture, rocket_flame.x - camera_pos_x, rocket_flame.y - camera_pos_y, rocket_flame.w, rocket_flame.h, rocket_flame.r, viewport_w, viewport_h);
+    int is_rocket_colliding = is_colliding(sprites, MAX_ENTITIES);
 
-    camera_pos_x = sprites[1].x - viewport_w / 2.0f + 50.0f; camera_pos_y = sprites[1].y - viewport_h / 2.0f + 50.0f;
+    camera_pos_x = sprites[1].x - viewport_w / 2.0f + 256.0f; camera_pos_y = sprites[1].y - viewport_h / 2.0f + 256.0f;
 
     if (is_rocket_colliding) {
         sprites[1].x = viewport_w / 2.0;
         sprites[1].y = viewport_h / 2.0;
+        rocket_acc_x = 0.0;
+        rocket_acc_y = 0.0;
+        rocket_radial_acc = 0.0;
         *current_state = 2;
     }
         
@@ -88,15 +187,18 @@ void game_state(float dt, int *current_state) {
 
     sprintf(str, "rocket accel: %.4f | radial accel: %.4f", fabs(rocket_acc_x + rocket_acc_y), fabs(rocket_radial_acc));
     sprintf(str2, "rocket colliding: %i", is_rocket_colliding);
+    sprintf(str3, "asteroids: %d", asteroid_count);
     gltSetText(text2, str);
     gltSetText(text1, str2);
+    gltSetText(text3, str3);
     
     gltColor(1.0f, 1.0f, 1.0f, 1.0f);
     gltDrawText2D(text1, 0.0f, 0.0f, 1.0f);
+    gltDrawText2D(text3, 0.0f, 20.0f, 1.0f);
 
     gltColor(
-        cosf((float)time) * 0.5f + 0.5f,
-        sinf((float)time) * 0.5f + 0.5f,
+        cosf((float)timer) * 0.5f + 0.5f,
+        sinf((float)timer) * 0.5f + 0.5f,
         1.0f,
         1.0f);
 
@@ -104,7 +206,7 @@ void game_state(float dt, int *current_state) {
 
     gltEndDraw();
 
-    time += dt;
+    timer += dt;
 }
 
 void game_over_state(float dt, int *current_state) {
@@ -128,6 +230,7 @@ void game_over_state(float dt, int *current_state) {
 
 int main(){
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS);
+    srand(time(NULL));
 
     if (init_audio() < 0) {
         printf("Audio initialization failed\n");
@@ -161,10 +264,11 @@ int main(){
     int meteor1_texture = texture_load("assets/images/mETEOR2.png");
     int meteor2_texture = texture_load("assets/images/mETEOR3.png");
     int meteor3_texture = texture_load("assets/images/mETEOR4.png");
-    int asteroid_albedo_texture = texture_load("assets/images/asteroid_albedo.png");
-    int asteroid_normal_texture = texture_load("assets/images/asteroid_normal.png");
+    asteroid_albedo_texture = texture_load("assets/images/asteroid_albedo.png");
+    asteroid_normal_texture = texture_load("assets/images/asteroid_normal.png");
     int rocket_albedo_texture = texture_load("assets/images/rocket_albedo.png");
     int rocket_normal_texture = texture_load("assets/images/rocket_normal.png");
+    int flame_albedo_texture = texture_load("assets/images/rocketflame.png");
     int placeholder_texture = texture_load("test.jpg");
 
     int sound_id = load_sound("assets/sfx/space.wav");
@@ -172,19 +276,19 @@ int main(){
 
     RCS_id = load_sound("assets/sfx/RCS.wav");
 
-    sprites[1] = (sprite_t){viewport_w / 2.0, viewport_h / 2.0, 512, 512, 120, 40, 75, rocket_albedo_texture, rocket_normal_texture};
-    //sprites[2] = (sprite_t){100, 150, 50, 50, 0, 0, 25, meteor0_texture};
-    //sprites[3] = (sprite_t){300, 500, 100, 50, 0, 0, 25, meteor1_texture};
-    //sprites[4] = (sprite_t){500, 300, 50, 50, 0, 0, 25, meteor2_texture};
+    rocket_flame = (sprite_t){viewport_w / 2.0, viewport_h / 2.0, 150, 500, 0, 0, 0, flame_albedo_texture};
+    sprites[1] = (sprite_t){viewport_w / 2.0, viewport_h / 2.0, 512, 512, 440, 105, 75, rocket_albedo_texture, rocket_normal_texture};
     sprites[5] = (sprite_t){800, 100, 200, 200, 0, 0, 70, asteroid_albedo_texture, asteroid_normal_texture};
 
     bool running = true;
 
     play_sound(sound_id, 1);
     play_RCS_sound(RCS_id);
+    pause_sound(RCS_id);
     
     text1 = gltCreateText();
     text2 = gltCreateText();
+    text3 = gltCreateText();
 
     Uint32 last_time = SDL_GetTicks();
 
@@ -204,6 +308,13 @@ int main(){
                     viewport_w = event.window.data1;
                     viewport_h = event.window.data2;
                     glViewport(0, 0, viewport_w, viewport_h);
+                    break;
+                case SDL_EVENT_KEY_DOWN:
+                    if (!event.key.repeat) {
+                        if (event.key.key == SDLK_LSHIFT) {
+                            engine_on = !engine_on;
+                        }
+                    }
                     break;
             }
         }
