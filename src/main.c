@@ -67,8 +67,8 @@ void spawn_asteroid() {
             float w = 100 + size;
             float h = 100 + size;
             sprites[i] = (sprite_t){px, py, w, h, 0, 0, w / 2.86f, 1.0, asteroid_albedo_texture, asteroid_normal_texture};
-            asteroid_data[i].vx = ((float)rand() / RAND_MAX - 0.5f) * 100.0f;
-            asteroid_data[i].vy = ((float)rand() / RAND_MAX - 0.5f) * 100.0f;
+            asteroid_data[i].vx = rocket_acc_x;
+            asteroid_data[i].vy = rocket_acc_y;
             asteroid_data[i].active = 1;
             asteroid_count++;
             break;
