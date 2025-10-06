@@ -38,9 +38,9 @@ int is_colliding(const sprite_t sprites[MAX_ENTITIES], int count) {
         float dist_sq = dx*dx + dy*dy;
 
         if (dist_sq < radius * radius) {
-            return true;
+            return i;
         }
     }
 
-    return false;
+    return 0;
 }

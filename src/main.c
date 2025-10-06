@@ -169,6 +169,13 @@ void update_tanks(float dt) {
     }
 }
 
+void collect_fuel(int id) {
+    tanks_data[id].active = false;
+    tank_count--;
+
+    rocket_fuel += 25.0;
+}
+
 void menu_state(float dt, int *current_state) {
     const bool* keys = SDL_GetKeyboardState(NULL);
     if (keys[SDL_SCANCODE_SPACE]) *current_state = 1;
@@ -265,19 +272,26 @@ void game_state(float dt, int *current_state) {
     }else{
         rocket_flame.alpha = 0.0;
     }
-    int is_rocket_colliding = is_colliding(sprites, MAX_ENTITIES);
 
     camera_pos_x = sprites[1].x - viewport_w / 2.0f + 256.0f; camera_pos_y = sprites[1].y - viewport_h / 2.0f + 256.0f;
 
-    if (is_rocket_colliding) {
-        sprites[1].x = viewport_w / 2.0;
-        sprites[1].y = viewport_h / 2.0;
-        rocket_acc_x = 0.0;
-        rocket_acc_y = 0.0;
-        rocket_radial_acc = 0.0;
-        disable_asteroids();
-        disable_tanks();
-        *current_state = 2;
+    int colliding_value = is_colliding(sprites, MAX_ENTITIES);
+
+    if (colliding_value > 1) { // 1 is the player
+        if (sprites[colliding_value].texture == tank_albedo_texture) { // is tank
+            collect_fuel(colliding_value);
+        }
+        else { // is asteroid
+            sprites[1].x = viewport_w / 2.0;
+            sprites[1].y = viewport_h / 2.0;
+            rocket_acc_x = 0.0;
+            rocket_acc_y = 0.0;
+            rocket_radial_acc = 0.0;
+            disable_asteroids();
+            disable_tanks();
+            rocket_fuel = 100.0;
+            *current_state = 2;
+        }
     }
         
     gltBeginDraw();
