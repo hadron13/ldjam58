@@ -324,8 +324,8 @@ void game_state(float dt, int *current_state) {
     gltSetText(text3, str3);
     
     gltColor(1.0f, 1.0f, 1.0f, 1.0f);
-    gltDrawText2D(text1, 0.0f, 0.0f, 1.0f);
-    gltDrawText2D(text3, 0.0f, 20.0f, 1.0f);
+    gltDrawText2D(text1, 0.0f, 0.0f, 3.0f);
+    gltDrawText2D(text3, 0.0f, 40.0f, 3.0f);
 
     gltColor(
         cosf((float)timer) * 0.5f + 0.5f,
