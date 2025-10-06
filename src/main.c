@@ -25,6 +25,7 @@ int background_shader;
 int RCS_id;
 float rocket_acc_x = 0, rocket_acc_y = 0;
 float rocket_radial_acc = 0;
+float rocket_fuel = 100.0;
 float speed = 2.0f;
 double timer = 0.0;
 char str[64];
@@ -140,14 +141,21 @@ void game_state(float dt, int *current_state) {
     if (keys[SDL_SCANCODE_Q]) rocket_radial_acc -= (speed / 90.0f) * dt;
     if (keys[SDL_SCANCODE_E]) rocket_radial_acc += (speed / 90.0f) * dt;
 
-    if (keys[SDL_SCANCODE_W] || keys[SDL_SCANCODE_S] || keys[SDL_SCANCODE_A]
-    || keys[SDL_SCANCODE_D] || keys[SDL_SCANCODE_Q] || keys[SDL_SCANCODE_E]) resume_sound(RCS_id, RCS_stream);
+    if ((keys[SDL_SCANCODE_W] || keys[SDL_SCANCODE_S] || keys[SDL_SCANCODE_A]
+    || keys[SDL_SCANCODE_D] || keys[SDL_SCANCODE_Q] || keys[SDL_SCANCODE_E]) && rocket_fuel >= 0.0) {
+        resume_sound(RCS_id, RCS_stream);
+        rocket_fuel -= dt;
+    }
     else pause_sound(RCS_id, RCS_stream);
 
     if (engine_on) {
         rocket_acc_x += cos_r * speed * 10.0f * dt;
         rocket_acc_y += sin_r * speed * 10.0f * dt;
+
+        rocket_fuel -= dt * 0.5;
     }
+
+    glm_clamp(rocket_fuel, 0.0, 100.0);
 
     update_audio(RCS_stream, RCS_spec);
 
@@ -176,8 +184,7 @@ void game_state(float dt, int *current_state) {
     
     render_entities(sprites, MAX_ENTITIES, sprite_shader, viewport_w, viewport_h, camera_pos_x, camera_pos_y);
 
-
-    if (engine_on){ 
+    if (engine_on && rocket_fuel >= 0.0){ 
         rocket_flame.alpha = glm_lerp(rocket_flame.alpha,1.0, 0.01);
         draw_quad(sprite_shader, rocket_flame.texture, rocket_flame.normal_texture, rocket_flame.x - camera_pos_x, rocket_flame.y - camera_pos_y, rocket_flame.w, rocket_flame.h, rocket_flame.r, rocket_flame.alpha, viewport_w, viewport_h);
     }else{
@@ -198,8 +205,8 @@ void game_state(float dt, int *current_state) {
         
     gltBeginDraw();
 
-    sprintf(str, "rocket accel: %.4f | radial accel: %.4f", fabs(rocket_acc_x + rocket_acc_y), fabs(rocket_radial_acc));
-    sprintf(str2, "rocket colliding: %i", is_rocket_colliding);
+    sprintf(str, "rocket vel: %.4f | radial vel: %.4f", fabs(rocket_acc_x + rocket_acc_y), fabs(rocket_radial_acc));
+    sprintf(str2, "fuel remaining: %.1f", rocket_fuel);
     sprintf(str3, "asteroids: %d", asteroid_count);
     gltSetText(text2, str);
     gltSetText(text1, str2);
