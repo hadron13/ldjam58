@@ -6,6 +6,7 @@
 #define MAX_ENTITIES 64
 
 typedef struct {
+    int visible;
     float x, y;
     float w, h;
     float c_w, c_h;
