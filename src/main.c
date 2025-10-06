@@ -123,12 +123,12 @@ void game_state(float dt, int *current_state) {
         rocket_acc_y -= sin_r * speed * dt;
     }
     if (keys[SDL_SCANCODE_A]) {
-        rocket_acc_x += -sin_r * speed * dt;
-        rocket_acc_y += cos_r * speed * dt;
-    }
-    if (keys[SDL_SCANCODE_D]) {
         rocket_acc_x += sin_r * speed * dt;
         rocket_acc_y += -cos_r * speed * dt;
+    }
+    if (keys[SDL_SCANCODE_D]) {
+        rocket_acc_x += -sin_r * speed * dt;
+        rocket_acc_y += cos_r * speed * dt;
     }
 
     if (keys[SDL_SCANCODE_Q]) rocket_radial_acc -= (speed / 90.0f) * dt;
