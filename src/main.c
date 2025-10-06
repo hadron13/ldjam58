@@ -416,7 +416,14 @@ int main(){
                 case SDL_EVENT_KEY_DOWN:
                     if (!event.key.repeat) {
                         if (event.key.key == SDLK_LSHIFT) {
-                            engine_on = !engine_on;
+                            engine_on = true;
+                        }
+                    }
+                    break;
+                case SDL_EVENT_KEY_UP:
+                    if (!event.key.repeat) {
+                        if (event.key.key == SDLK_LSHIFT) {
+                            engine_on = false;
                         }
                     }
                     break;
