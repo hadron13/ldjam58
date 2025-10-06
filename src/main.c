@@ -82,6 +82,7 @@ void spawn_asteroid() {
 void disable_asteroids() {
     for (int i = 0; i < MAX_ENTITIES; i++) {
         asteroid_data[i].active = false;
+        asteroid_count = 0;
     }
 }
 
