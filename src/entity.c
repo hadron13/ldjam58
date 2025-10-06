@@ -1,8 +1,8 @@
 #include "entity.h"
 
-void render_entities(const sprite_t sprites[MAX_ENTITIES], int count, int shader_program, float window_w, float window_h, float camera_pos_x, float camera_pos_y) {
+void render_entities(const sprite_t sprites[MAX_ENTITIES], int count, int shader_program, float window_w, float window_h, float camera_pos_x, float camera_pos_y, float camera_scale) {
     for (int i = 0; i < count; ++i) {
-        if (sprites[i].visible) draw_quad(shader_program, sprites[i].texture, sprites[i].normal_texture, sprites[i].x - camera_pos_x, sprites[i].y - camera_pos_y, sprites[i].w, sprites[i].h, sprites[i].r, sprites[i].alpha, window_w, window_h);
+        if (sprites[i].visible) draw_quad(shader_program, sprites[i].texture, sprites[i].normal_texture, sprites[i].x - camera_pos_x, sprites[i].y - camera_pos_y, sprites[i].w * camera_scale, sprites[i].h * camera_scale, sprites[i].r, sprites[i].alpha, window_w, window_h);
     }
 }
 

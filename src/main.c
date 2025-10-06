@@ -19,6 +19,7 @@ sprite_t rocket_flame;
 int viewport_w = 800, viewport_h = 600;
 
 float camera_pos_x = 0.0, camera_pos_y = 0.0;
+float camera_scale = 1.0;
 
 int sprite_shader;
 int background_shader;
@@ -73,7 +74,7 @@ void spawn_asteroid() {
     for (int i = 2; i < MAX_ASTEROIDS; i++) {
         if (!asteroid_data[i].active && i != 1) {
             float angle = ((float)rand() / RAND_MAX) * 2.0f * M_PI;
-            float dist = 1000.0f + ((float)rand() / RAND_MAX) * 500.0f;
+            float dist = 2000.0f + ((float)rand() / RAND_MAX) * 500.0f;
             float px = sprites[1].x + cosf(angle) * dist;
             float py = sprites[1].y + sinf(angle) * dist;
             float size = rand() % 200;
@@ -174,7 +175,7 @@ void update_tanks(float dt) {
 }
 
 void collect_fuel(int id) {
-    tanks_data[id].active = false;
+    asteroid_data[id].active = 0;
     tank_count--;
     sprites[id].visible = 0;
 
@@ -240,7 +241,7 @@ void game_state(float dt, int *current_state) {
         rocket_fuel -= dt * 0.5;
     }
 
-    glm_clamp(rocket_fuel, 0.0, 100.0);
+    rocket_fuel = glm_clamp(rocket_fuel, 0.0, 100.0);
 
     update_audio(RCS_id, &RCS_stream, &RCS_spec);
     update_audio(background_id, &background_stream, &background_spec);
@@ -269,7 +270,7 @@ void game_state(float dt, int *current_state) {
 
     draw_quad(background_shader, 0, 0, 0, 0, viewport_w, viewport_h, 0, 0, viewport_w, viewport_h);
     
-    render_entities(sprites, MAX_ENTITIES, sprite_shader, viewport_w, viewport_h, camera_pos_x, camera_pos_y);
+    render_entities(sprites, MAX_ENTITIES, sprite_shader, viewport_w, viewport_h, camera_pos_x, camera_pos_y, camera_scale);
 
     if (engine_on && rocket_fuel >= 0.0){ 
         rocket_flame.alpha = glm_lerp(rocket_flame.alpha,1.0, 0.01);
