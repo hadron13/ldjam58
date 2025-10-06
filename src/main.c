@@ -79,6 +79,12 @@ void spawn_asteroid() {
     }
 }
 
+void disable_asteroids() {
+    for (int i = 0; i < MAX_ENTITIES; i++) {
+        asteroid_data[i].active = false;
+    }
+}
+
 void update_asteroids(float dt) {
     for (int i = 0; i < MAX_ENTITIES; i++) {
         if (asteroid_data[i].active && i != 1) {
@@ -205,6 +211,7 @@ void game_state(float dt, int *current_state) {
         rocket_acc_x = 0.0;
         rocket_acc_y = 0.0;
         rocket_radial_acc = 0.0;
+        disable_asteroids();
         *current_state = 2;
     }
         
