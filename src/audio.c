@@ -61,18 +61,18 @@ void play_sound(int id, int loop, SDL_AudioStream **audio_stream) {
 
 static bool RCS_paused = false;
 
-void pause_sound(int id, SDL_AudioStream **audio_stream) {
-    if (RCS_paused) return;
-    RCS_paused = true;
+void pause_sound(int id, SDL_AudioStream **audio_stream, bool *is_paused) {
+    if (*is_paused) return;
+    *is_paused = true;
     SDL_AudioDeviceID dev = SDL_GetAudioStreamDevice(*audio_stream);
     if (dev != 0) {
         SDL_PauseAudioDevice(dev);
     }
 }
 
-void resume_sound(int id, SDL_AudioStream **audio_stream) {
-    if (!RCS_paused) return;
-    RCS_paused = false;
+void resume_sound(int id, SDL_AudioStream **audio_stream, bool *is_paused) {
+    if (!*is_paused) return;
+    *is_paused = false;
     SDL_ResumeAudioStreamDevice(*audio_stream);
 }
 

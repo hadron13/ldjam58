@@ -25,6 +25,11 @@ int sprite_shader;
 int background_shader;
 int RCS_id;
 int background_id;
+int engine_id;
+
+bool RCS_paused = false;
+bool engine_paused = false;
+
 float rocket_acc_x = 0, rocket_acc_y = 0;
 float rocket_radial_acc = 0;
 float rocket_fuel = 100.0;
@@ -69,6 +74,9 @@ SDL_AudioStream *background_stream;
 
 SDL_AudioSpec RCS_spec;
 SDL_AudioStream *RCS_stream;
+
+SDL_AudioSpec engine_spec;
+SDL_AudioStream *engine_stream;
 
 void spawn_asteroid() {
     for (int i = 2; i < MAX_ASTEROIDS; i++) {
@@ -229,21 +237,27 @@ void game_state(float dt, int *current_state) {
 
     if ((keys[SDL_SCANCODE_W] || keys[SDL_SCANCODE_S] || keys[SDL_SCANCODE_A]
     || keys[SDL_SCANCODE_D] || keys[SDL_SCANCODE_Q] || keys[SDL_SCANCODE_E]) && rocket_fuel >= 0.0) {
-        resume_sound(RCS_id, &RCS_stream);
+        resume_sound(RCS_id, &RCS_stream, &RCS_paused);
         rocket_fuel -= dt;
     }
-    else pause_sound(RCS_id, &RCS_stream);
+    else pause_sound(RCS_id, &RCS_stream, &RCS_paused);
 
     if (engine_on) {
-        rocket_acc_x += cos_r * speed * 10.0f * dt;
-        rocket_acc_y += sin_r * speed * 10.0f * dt;
+        rocket_acc_x += cos_r * speed * 3.0f * dt;
+        rocket_acc_y += sin_r * speed * 3.0f * dt;
 
         rocket_fuel -= dt * 0.5;
+
+        resume_sound(engine_id, &engine_stream, &engine_paused);
+    }
+    else {
+        pause_sound(engine_id, &engine_stream, &engine_paused);
     }
 
     rocket_fuel = glm_clamp(rocket_fuel, 0.0, 100.0);
 
     update_audio(RCS_id, &RCS_stream, &RCS_spec);
+    update_audio(engine_id, &engine_stream, &engine_spec);
     update_audio(background_id, &background_stream, &background_spec);
 
     sprites[1].x += rocket_acc_x; sprites[1].y += rocket_acc_y;
@@ -351,6 +365,7 @@ int main(){
 
     init_audio(&background_spec, &background_stream);
     init_audio(&RCS_spec, &RCS_stream);
+    init_audio(&engine_spec, &engine_stream);
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
@@ -399,6 +414,7 @@ int main(){
 
     background_id = load_sound("assets/sfx/space.wav", &background_spec);
     RCS_id = load_sound("assets/sfx/RCS.wav", &RCS_spec);
+    engine_id = load_sound("assets/sfx/engine.wav", &engine_spec);
 
     rocket_flame = (sprite_t){1, viewport_w / 2.0, viewport_h / 2.0, 150, 500, 0, 0, 0, 1.0, flame_albedo_texture};
     sprites[1] = (sprite_t){1, viewport_w / 2.0, viewport_h / 2.0, 512, 512, 440, 105, 75, 1.0, rocket_albedo_texture, rocket_normal_texture};
@@ -408,7 +424,10 @@ int main(){
 
     play_sound(background_id, 1, &background_stream);
     play_sound(RCS_id, 1, &RCS_stream);
-    pause_sound(RCS_id, &RCS_stream);
+    play_sound(engine_id, 1, &engine_stream);
+    
+    pause_sound(RCS_id, &RCS_stream, &RCS_paused);
+    pause_sound(engine_id, &engine_stream, &engine_paused);
     
     text1 = gltCreateText();
     text2 = gltCreateText();
