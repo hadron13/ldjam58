@@ -41,14 +41,27 @@ int engine_on = false;
 int asteroid_albedo_textures[3];
 int asteroid_normal_textures[3];
 
+int tank_albedo_texture;
+int tank_normal_texture;
+
 typedef struct {
     float vx, vy;
     int active;
 } asteroid_data_t;
 
-asteroid_data_t asteroid_data[MAX_ENTITIES];
+typedef struct {
+    float vx, vy;
+    int active;
+} tanks_data_t;
+
+#define MAX_TANKS 5
+#define MAX_ASTEROIDS MAX_ENTITIES-MAX_TANKS
+
+asteroid_data_t asteroid_data[MAX_ASTEROIDS];
+tanks_data_t tanks_data[MAX_TANKS];
 
 int asteroid_count = 0;
+int tank_count = 0;
 
 SDL_AudioSpec background_spec;
 SDL_AudioStream *background_stream;
@@ -57,7 +70,7 @@ SDL_AudioSpec RCS_spec;
 SDL_AudioStream *RCS_stream;
 
 void spawn_asteroid() {
-    for (int i = 0; i < MAX_ENTITIES; i++) {
+    for (int i = 0; i < MAX_ASTEROIDS; i++) {
         if (!asteroid_data[i].active && i != 1) {
             float angle = ((float)rand() / RAND_MAX) * 2.0f * M_PI;
             float dist = 1000.0f + ((float)rand() / RAND_MAX) * 500.0f;
@@ -80,14 +93,14 @@ void spawn_asteroid() {
 }
 
 void disable_asteroids() {
-    for (int i = 0; i < MAX_ENTITIES; i++) {
+    for (int i = 0; i < MAX_ASTEROIDS; i++) {
         asteroid_data[i].active = false;
         asteroid_count = 0;
     }
 }
 
 void update_asteroids(float dt) {
-    for (int i = 0; i < MAX_ENTITIES; i++) {
+    for (int i = 0; i < MAX_ASTEROIDS; i++) {
         if (asteroid_data[i].active && i != 1) {
             sprites[i].x += asteroid_data[i].vx * dt;
             sprites[i].y += asteroid_data[i].vy * dt;
@@ -103,6 +116,55 @@ void update_asteroids(float dt) {
     if (asteroid_count < 10) {
         if (rand() % 100 < 5) {
             spawn_asteroid();
+        }
+    }
+}
+
+void spawn_tanks() {
+    for (int i = 0; i < MAX_TANKS; i++) {
+        if (!tanks_data[i].active && i != 1) {
+            float angle = ((float)rand() / RAND_MAX) * 2.0f * M_PI;
+            float dist = 1000.0f + ((float)rand() / RAND_MAX) * 500.0f;
+            float px = sprites[1].x + cosf(angle) * dist;
+            float py = sprites[1].y + sinf(angle) * dist;
+            float size = rand() % 200;
+            float w = 100 + size;
+            float h = 100 + size;
+            int rand_num = rand() % 3;
+            sprites[i] = (sprite_t){px, py, w, h, 0, 0, w / 2.86f, 1.0, tank_albedo_texture, tank_normal_texture};
+            tanks_data[i].vx = 0.0;
+            tanks_data[i].vy = 0.0;
+            tanks_data[i].active = 1;
+            tank_count++;
+            break;
+        }
+    }
+}
+
+void disable_tanks() {
+    for (int i = 0; i < MAX_TANKS; i++) {
+        tanks_data[i].active = false;
+        tank_count = 0;
+    }
+}
+
+void update_tanks(float dt) {
+    for (int i = 0; i < MAX_TANKS; i++) {
+        if (tanks_data[i].active && i != 1) {
+            sprites[i].x += tanks_data[i].vx * dt;
+            sprites[i].y += tanks_data[i].vy * dt;
+            float dx = sprites[i].x - sprites[1].x;
+            float dy = sprites[i].y - sprites[1].y;
+            float dist = sqrtf(dx * dx + dy * dy);
+            if (dist > 2500.0f) {
+                tanks_data[i].active = 0;
+                tank_count--;
+            }
+        }
+    }
+    if (tank_count < 2) {
+        if (rand() % 100 < 5) {
+            spawn_tanks();
         }
     }
 }
@@ -173,7 +235,7 @@ void game_state(float dt, int *current_state) {
 
     sprites[1].x += rocket_acc_x; sprites[1].y += rocket_acc_y;
     sprites[1].r += rocket_radial_acc;
-    sprites[5].r += rocket_radial_acc;
+    //sprites[5].r += rocket_radial_acc;
 
     float flame_offset = (sprites[1].h / 2.0f) + (rocket_flame.h / 2.0f) - 45.0f;
 
@@ -188,6 +250,7 @@ void game_state(float dt, int *current_state) {
     rocket_flame.r = sprites[1].r - 1.57f;
 
     update_asteroids(dt);
+    update_tanks(dt);
 
     glClearColor(0.1, 0.1, 0.1, 1.0); 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -213,6 +276,7 @@ void game_state(float dt, int *current_state) {
         rocket_acc_y = 0.0;
         rocket_radial_acc = 0.0;
         disable_asteroids();
+        disable_tanks();
         *current_state = 2;
     }
         
@@ -297,9 +361,13 @@ int main(){
     int asteroid_normal_texture2 = texture_load("assets/images/asteroid2_normal.png");
     int asteroid_albedo_texture3 = texture_load("assets/images/asteroid3_albedo.png");
     int asteroid_normal_texture3 = texture_load("assets/images/asteroid3_normal.png");
+
     int rocket_albedo_texture = texture_load("assets/images/rocket_albedo.png");
     int rocket_normal_texture = texture_load("assets/images/rocket_normal.png");
     int flame_albedo_texture = texture_load("assets/images/rocketflame.png");
+
+    tank_albedo_texture = texture_load("assets/images/tank_albedo.png");
+    tank_normal_texture = texture_load("assets/images/tank_normal.png");
 
     asteroid_albedo_textures[0] = asteroid_albedo_texture1;
     asteroid_albedo_textures[1] = asteroid_albedo_texture2;
