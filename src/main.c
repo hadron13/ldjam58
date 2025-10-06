@@ -283,11 +283,6 @@ int main(){
     sprite_shader = shader_compile("assets/shaders/quad.vert.glsl", "assets/shaders/sprite.frag.glsl");    
     background_shader = shader_compile("assets/shaders/quad.vert.glsl", "assets/shaders/background.frag.glsl");
 
-    int background_texture = texture_load("assets/images/Space_Background1.png");
-    int meteor0_texture = texture_load("assets/images/mETEOR1.png");
-    int meteor1_texture = texture_load("assets/images/mETEOR2.png");
-    int meteor2_texture = texture_load("assets/images/mETEOR3.png");
-    int meteor3_texture = texture_load("assets/images/mETEOR4.png");
     int asteroid_albedo_texture1 = texture_load("assets/images/asteroid_albedo.png");
     int asteroid_normal_texture1 = texture_load("assets/images/asteroid_normal.png");
     int asteroid_albedo_texture2 = texture_load("assets/images/asteroid2_albedo.png");
@@ -297,7 +292,6 @@ int main(){
     int rocket_albedo_texture = texture_load("assets/images/rocket_albedo.png");
     int rocket_normal_texture = texture_load("assets/images/rocket_normal.png");
     int flame_albedo_texture = texture_load("assets/images/rocketflame.png");
-    int placeholder_texture = texture_load("test.jpg");
 
     asteroid_albedo_textures[0] = asteroid_albedo_texture1;
     asteroid_albedo_textures[1] = asteroid_albedo_texture2;
