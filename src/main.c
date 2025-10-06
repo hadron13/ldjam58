@@ -33,7 +33,7 @@ bool engine_paused = false;
 float rocket_acc_x = 0, rocket_acc_y = 0;
 float rocket_radial_acc = 0;
 float rocket_fuel = 100.0;
-float speed = 2.0f;
+float speed = 1.0f;
 double timer = 0.0;
 char str[64];
 char str2[64];
@@ -243,8 +243,8 @@ void game_state(float dt, int *current_state) {
     else pause_sound(RCS_id, &RCS_stream, &RCS_paused);
 
     if (engine_on) {
-        rocket_acc_x += cos_r * speed * 3.0f * dt;
-        rocket_acc_y += sin_r * speed * 3.0f * dt;
+        rocket_acc_x += cos_r * speed * 5.0f * dt;
+        rocket_acc_y += sin_r * speed * 5.0f * dt;
 
         rocket_fuel -= dt * 0.5;
 
