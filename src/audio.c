@@ -77,7 +77,7 @@ void resume_sound(int id, SDL_AudioStream **audio_stream) {
 }
 
 // unsafe nuclear explosions generator \/
-void update_audio(SDL_AudioStream **audio_stream, SDL_AudioSpec *audio_spec) {
+void update_audio(int i, SDL_AudioStream **audio_stream, SDL_AudioSpec *audio_spec) {
     if (!*audio_stream) return;
 
     const int samples_per_chunk = 4096;
@@ -88,9 +88,9 @@ void update_audio(SDL_AudioStream **audio_stream, SDL_AudioSpec *audio_spec) {
     Sint16 *mix_buffer = (Sint16*)SDL_calloc(1, buffer_size);
     if (!mix_buffer) return;
 
-    for (int i = 0; i < num_sounds; i++) {
+    {
         sound_t *s = &sounds[i];
-        if (!s->data) continue;
+        if (!s->data) return;
 
         int remaining = s->len - s->position;
         if (remaining <= 0) {
@@ -98,7 +98,7 @@ void update_audio(SDL_AudioStream **audio_stream, SDL_AudioSpec *audio_spec) {
                 s->position = 0;
                 remaining = s->len;
             } else {
-                continue;
+                return;
             }
         }
 

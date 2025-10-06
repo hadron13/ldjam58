@@ -23,6 +23,7 @@ float camera_pos_x = 0.0, camera_pos_y = 0.0;
 int sprite_shader;
 int background_shader;
 int RCS_id;
+int background_id;
 float rocket_acc_x = 0, rocket_acc_y = 0;
 float rocket_radial_acc = 0;
 float rocket_fuel = 100.0;
@@ -157,8 +158,8 @@ void game_state(float dt, int *current_state) {
 
     glm_clamp(rocket_fuel, 0.0, 100.0);
 
-    update_audio(&RCS_stream, &RCS_spec);
-    update_audio(&background_stream, &background_spec);
+    update_audio(RCS_id, &RCS_stream, &RCS_spec);
+    update_audio(background_id, &background_stream, &background_spec);
 
     sprites[1].x += rocket_acc_x; sprites[1].y += rocket_acc_y;
     sprites[1].r += rocket_radial_acc;
@@ -291,7 +292,7 @@ int main(){
     int flame_albedo_texture = texture_load("assets/images/rocketflame.png");
     int placeholder_texture = texture_load("test.jpg");
 
-    int background_id = load_sound("assets/sfx/space.wav", &background_spec);
+    background_id = load_sound("assets/sfx/space.wav", &background_spec);
     RCS_id = load_sound("assets/sfx/RCS.wav", &RCS_spec);
 
     rocket_flame = (sprite_t){viewport_w / 2.0, viewport_h / 2.0, 150, 500, 0, 0, 0, 1.0, flame_albedo_texture};
