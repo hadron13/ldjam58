@@ -251,6 +251,7 @@ void main() {
 
     //Texture/noise mapping
     vec2 terrain_noise_pos = centered_uv * 0.4 * (2.0-normal);
+    terrain_noise_pos.x += time/100.0;
     float height = pNoise(terrain_noise_pos, 10) * 4.0;
 
     //Terrain_normal
@@ -282,9 +283,9 @@ void main() {
 
     float equatorness = 1.0 - abs(terrain_noise_pos.y*1.5);
 
-    vec3 ground_color = mix(vegetation_color, beach_color, (equatorness-0.5)*2.0);
-    ground_color = mix(ground_color, mountain_color, smoothstep(0.3, 0.5, max(0.0, 0.8-equatorness)));
-    ground_color = mix(ground_color, mountain_color, smoothstep(0.4, 1.0, height));
+    vec3 ground_color = mix(vegetation_color, beach_color, clamp((equatorness-0.5)*2.0 - height, 0.0, 1.0));
+    ground_color = mix(ground_color, mountain_color, smoothstep(0.4, 0.5, max(0.0, 0.8-equatorness)));
+    ground_color = mix(ground_color, mountain_color, smoothstep(0.5, 0.8, height));
 
 
     vec3 terrain_color = mix(water_color, ground_color, step(0.15, height));
@@ -293,9 +294,24 @@ void main() {
     diffuse_factor = min(diffuse_factor, length(scatter)*1.0);
 
 
+    vec2 cloud_pos = centered_uv * (2.0-normal) * vec2(0.2, 0.2);
+    cloud_pos.x += 200.0 + time/140.0;
+    vec2 fine_cloud_pos = cloud_pos * 4.0;
+
+    float turbulence_angle = pNoise(cloud_pos * 2.0, 3) * PI * 2.0 + time/10.0;
+    vec2 turbulence_direction = vec2(sin(turbulence_angle), cos(turbulence_angle));
+
+    float cloud_thickness = (pNoise(cloud_pos      + turbulence_direction*0.05, 5)) * 4.0+
+                             pNoise(fine_cloud_pos + turbulence_direction*1.0, 4)  * 0.5;
+
+    cloud_thickness = smoothstep(0.2, 1.0, cloud_thickness) * 1.0;
+
+    float fog_factor = 1.0 - exp(-cloud_thickness * 1.5);
 
     color += vec3(diffuse_factor * terrain_color) * is_earth;
+    color = mix(color, vec3(1.0) * length(scatter) * is_earth, fog_factor); 
     color += scatter * vec3(1.0, 1.0, 1.5);
+    
     
 
     color = pow(color, vec3(1.0/2.2));
